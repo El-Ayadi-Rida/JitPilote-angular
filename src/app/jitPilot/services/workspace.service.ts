@@ -12,25 +12,25 @@ export class WorkspaceService {
   constructor(private http: HttpClient) { }
 
   getAllWorkspace(): Observable<workspace[]> {
-    return this.http.get<workspace[]>(`${environment.URL_API}workspaces`);
+    return this.http.get<workspace[]>(`${environment.URL_API}/workspaces`);
   }
   
 
   deleteWorkspace(id: number): Observable<workspace> {
-    return this.http.delete<workspace>(`${environment.URL_API}workspaces/${id}`);
+    return this.http.delete<workspace>(`${environment.URL_API}/workspaces/${id}`);
   }
 
 
   getWorkspaceById(id: number): Observable<workspace> {
-    return this.http.get<workspace>(`${environment.URL_API}workspaces/${id}`);
+    return this.http.get<workspace>(`${environment.URL_API}/workspaces/${id}`);
   }
 
   create(id: number, data: workspace): Observable<workspace> {
-    return this.http.post<workspace>(`${environment.URL_API}workspaces/user/${id}`, data);
+    return this.http.post<workspace>(`${environment.URL_API}/workspaces/user/${id}`, data);
   }
 
   update(id: number, data: workspace): Observable<workspace> {
-    return this.http.put<workspace>(`${environment.URL_API}workspaces/${id}`, data);
+    return this.http.put<workspace>(`${environment.URL_API}/workspaces/${id}`, data);
   }
 
 
