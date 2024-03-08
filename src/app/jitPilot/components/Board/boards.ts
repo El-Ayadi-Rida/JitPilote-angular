@@ -3,6 +3,10 @@ import Swal from 'sweetalert2';
 import { animate, style, transition, trigger } from '@angular/animations';
 import { ModalComponent } from 'angular-custom-modal';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Board } from '../../models/board';
+import { BoardPage } from '../../models/board-page';
+import { BoardService } from '../../services/board.service';
+import { AccessLevel } from '../../models/access-level';
 
 @Component({
     moduleId: module.id,
@@ -15,225 +19,22 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
     ],
 })
 export class BoardsComponent {
-    constructor(public fb: FormBuilder) {}
+    constructor(public fb: FormBuilder , private boardService:BoardService) {}
     defaultParams = {
-        id: null,
-        title: '',
+        boardId: null,
+        boardName: '',
         description: '',
-        tag: '',
-        user: '',
-        thumb: '',
+        fav: false,
+        accessLevel: AccessLevel.PRIVATE,
     };
-    @ViewChild('isAddNoteModal') isAddNoteModal!: ModalComponent;
-    @ViewChild('isDeleteNoteModal') isDeleteNoteModal!: ModalComponent;
-    @ViewChild('isViewNoteModal') isViewNoteModal!: ModalComponent;
+    @ViewChild('isAddBoardModal') isAddBoardModal!: ModalComponent;
+    @ViewChild('isDeleteBoardModal') isDeleteBoardModal!: ModalComponent;
+    @ViewChild('isViewBoardModal') isViewBoardModal!: ModalComponent;
     params!: FormGroup;
     isShowNoteMenu = false;
-    notesList = [
-        {
-            id: 1,
-            user: 'Max Smith',
-            thumb: 'profile-16.jpeg',
-            title: 'Meeting with Kelly',
-            description: 'Curabitur facilisis vel elit sed dapibus sodales purus rhoncus.',
-            date: '11/01/2020',
-            isFav: false,
-            tag: 'personal',
-        },
-        {
-            id: 2,
-            user: 'John Doe',
-            thumb: 'profile-14.jpeg',
-            title: 'Receive Package',
-            description: 'Facilisis curabitur facilisis vel elit sed dapibus sodales purus.',
-            date: '11/02/2020',
-            isFav: true,
-            tag: '',
-        },
-        {
-            id: 3,
-            user: 'Kia Jain',
-            thumb: 'profile-15.jpeg',
-            title: 'Download Docs',
-            description: 'Proin a dui malesuada, laoreet mi vel, imperdiet diam quam laoreet.',
-            date: '11/04/2020',
-            isFav: false,
-            tag: 'work',
-        },
-        {
-            id: 4,
-            user: 'Max Smith',
-            thumb: 'profile-16.jpeg',
-            title: 'Meeting at 4:50pm',
-            description: 'Excepteur sint occaecat cupidatat non proident, anim id est laborum.',
-            date: '11/08/2020',
-            isFav: false,
-            tag: '',
-        },
-        {
-            id: 5,
-            user: 'Karena Courtliff',
-            thumb: 'profile-17.jpeg',
-            title: 'Backup Files EOD',
-            description: 'Maecenas condimentum neque mollis, egestas leo ut, gravida.',
-            date: '11/09/2020',
-            isFav: false,
-            tag: '',
-        },
-        {
-            id: 6,
-            user: 'Max Smith',
-            thumb: 'profile-16.jpeg',
-            title: 'Download Server Logs',
-            description: 'Suspendisse efficitur diam quis gravida. Nunc molestie est eros.',
-            date: '11/09/2020',
-            isFav: false,
-            tag: 'social',
-        },
-        {
-            id: 7,
-            user: 'Vladamir Koschek',
-            thumb: '',
-            title: 'Team meet at Starbucks',
-            description: 'Etiam a odio eget enim aliquet laoreet lobortis sed ornare nibh.',
-            date: '11/10/2020',
-            isFav: false,
-            tag: '',
-        },
-        {
-            id: 8,
-            user: 'Max Smith',
-            thumb: 'profile-16.jpeg',
-            title: 'Create new users Profile',
-            description: 'Duis aute irure in nulla pariatur. Etiam a odio eget enim aliquet.',
-            date: '11/11/2020',
-            isFav: false,
-            tag: 'important',
-        },
-        {
-            id: 9,
-            user: 'Robert Garcia',
-            thumb: 'profile-21.jpeg',
-            title: 'Create a compost pile',
-            description: 'Zombie ipsum reversus ab viral inferno, nam rick grimes malum cerebro.',
-            date: '11/12/2020',
-            isFav: true,
-            tag: '',
-        },
-        {
-            id: 10,
-            user: 'Marie Hamilton',
-            thumb: 'profile-2.jpeg',
-            title: 'Take a hike at a local park',
-            description: 'De carne lumbering animata corpora quaeritis. Summus brains sit',
-            date: '11/13/2020',
-            isFav: true,
-            tag: '',
-        },
-        {
-            id: 11,
-            user: 'Megan Meyers',
-            thumb: 'profile-1.jpeg',
-            title: 'Take a class at local community center that interests you',
-            description: 'Cupcake ipsum dolor. Sit amet marshmallow topping cheesecake muffin.',
-            date: '11/13/2020',
-            isFav: false,
-            tag: '',
-        },
-        {
-            id: 12,
-            user: 'Angela Hull',
-            thumb: 'profile-22.jpeg',
-            title: 'Research a topic interested in',
-            description: 'Lemon drops tootsie roll marshmallow halvah carrot cake.',
-            date: '11/14/2020',
-            isFav: false,
-            tag: '',
-        },
-        {
-            id: 13,
-            user: 'Karen Wolf',
-            thumb: 'profile-23.jpeg',
-            title: 'Plan a trip to another country',
-            description: 'Space, the final frontier. These are the voyages of the Starship Enterprise.',
-            date: '11/16/2020',
-            isFav: true,
-            tag: '',
-        },
-        {
-            id: 14,
-            user: 'Jasmine Barnes',
-            thumb: 'profile-1.jpeg',
-            title: 'Improve touch typing',
-            description: 'Well, the way they make shows is, they make one show.',
-            date: '11/16/2020',
-            isFav: false,
-            tag: '',
-        },
-        {
-            id: 15,
-            user: 'Thomas Cox',
-            thumb: 'profile-11.jpeg',
-            title: 'Learn Express.js',
-            description: 'Bulbasaur Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-            date: '11/17/2020',
-            isFav: false,
-            tag: 'work',
-        },
-        {
-            id: 16,
-            user: 'Marcus Jones',
-            thumb: 'profile-12.jpeg',
-            title: 'Learn calligraphy',
-            description: 'Ivysaur Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-            date: '11/17/2020',
-            isFav: false,
-            tag: '',
-        },
-        {
-            id: 17,
-            user: 'Matthew Gray',
-            thumb: 'profile-24.jpeg',
-            title: 'Have a photo session with some friends',
-            description: 'Venusaur Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-            date: '11/18/2020',
-            isFav: false,
-            tag: 'important',
-        },
-        {
-            id: 18,
-            user: 'Chad Davis',
-            thumb: 'profile-31.jpeg',
-            title: 'Go to the gym',
-            description: 'Charmander Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-            date: '11/18/2020',
-            isFav: false,
-            tag: '',
-        },
-        {
-            id: 19,
-            user: 'Linda Drake',
-            thumb: 'profile-23.jpeg',
-            title: 'Make own LEGO creation',
-            description: 'Charmeleon Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-            date: '11/18/2020',
-            isFav: false,
-            tag: 'social',
-        },
-        {
-            id: 20,
-            user: 'Kathleen Flores',
-            thumb: 'profile-34.jpeg',
-            title: 'Take cat on a walk',
-            description: 'Baseball ipsum dolor sit amet cellar rubber win hack tossed. ',
-            date: '11/18/2020',
-            isFav: false,
-            tag: 'personal',
-        },
-    ];
-    filterdNotesList: any = '';
+    filterdBoardsList: Board[] = [];
     selectedTab: any = 'all';
-    deletedNote: any = null;
+    deletedBoard: any = null;
     selectedNote: any = {
         id: null,
         title: '',
@@ -242,124 +43,186 @@ export class BoardsComponent {
         user: '',
         thumb: '',
     };
+    selectedBoard: any;
+
+    boardList:Board[] = [];
+    boardPage:BoardPage | undefined 
 
     ngOnInit() {
-        this.searchNotes();
+        this.getAllBoards();
     }
 
-    initForm() {
-        this.params = this.fb.group({
-            id: [0],
-            title: ['', Validators.required],
-            description: [''],
-            tag: [''],
-            user: [''],
-            thumb: [''],
+    getAllBoards(){
+        this.boardService.getAllBoards().subscribe((data) => {
+            this.boardPage = data;
+            this.boardList = this.boardPage.content;
+            
+            switch(this.selectedTab) {
+                case 'all':
+                  this.filterdBoardsList = this.boardList;
+                  break;
+                case 'fav':
+                  this.filterdBoardsList = this.boardList.filter(board => board.fav === true);
+                  break;
+                case 'PRIVATE':
+                  this.filterdBoardsList = this.boardList.filter(board => board.accessLevel === AccessLevel.PRIVATE);
+                  break;
+                case 'PUBLIC':
+                    this.filterdBoardsList = this.boardList.filter(board => board.accessLevel === AccessLevel.PUBLIC);
+                    break;
+                default:
+                  console.log('Unknown option');
+              }
+            console.log(`${this.boardList} fetched succesfully`);
         });
     }
 
-    searchNotes() {
-        if (this.selectedTab != 'fav') {
-            if (this.selectedTab != 'all' || this.selectedTab === 'delete') {
-                this.filterdNotesList = this.notesList.filter((d: { tag: any }) => d.tag === this.selectedTab);
-            } else {
-                this.filterdNotesList = this.notesList;
-            }
-        } else {
-            this.filterdNotesList = this.notesList.filter((d: { isFav: any }) => d.isFav);
-        }
+
+    initForm() {
+        this.params = this.fb.group({
+            boardId: [0],
+            boardName: ['', Validators.required],
+            description: [''],
+            fav: [false],
+            accessLevel: [AccessLevel.PRIVATE],
+        });
+
     }
 
-    saveNote() {
-        if (this.params.controls['title'].errors) {
-            this.showMessage('Title is required.', 'error');
+
+    saveBoard() {
+        if (this.params.controls['boardName'].errors) {
+            this.showMessage('board Name is required.', 'error');
             return;
         }
-        if (this.params.value.id) {
+        if (this.params.value.boardId) {
             //update task
-            let note: any = this.notesList.find((d: { id: any }) => d.id === this.params.value.id);
-            note.title = this.params.value.title;
-            note.user = this.params.value.user;
-            note.description = this.params.value.description;
-            note.tag = this.params.value.tag;
-        } else {
-            //add note
-            let maxNoteId = this.notesList.length
-                ? this.notesList.reduce((max: number, character: { id: number }) => (character.id > max ? character.id : max), this.notesList[0].id)
-                : 0;
-            let dt = new Date();
-            let note = {
-                id: maxNoteId + 1,
-                title: this.params.value.title,
-                user: this.params.value.user,
-                thumb: 'profile-21.jpeg',
+            const boardToUpdate: any ={
+                boardId: this.params.value.boardId,
+                boardName: this.params.value.boardName,
                 description: this.params.value.description,
-                date: dt.getDate() + '/' + Number(dt.getMonth()) + 1 + '/' + dt.getFullYear(),
-                isFav: false,
-                tag: this.params.value.tag,
-            };
-            this.notesList.splice(0, 0, note);
-            this.searchNotes();
+                fav: this.params.value.fav,
+                accessLevel: this.params.value.accessLevel,
+            }
+            this.boardService.updateBoard(
+                this.params.value.boardId,
+                boardToUpdate
+                )
+            .subscribe(
+                response => {
+                    console.log('Board updated successfully:', response);
+                    this.getAllBoards();
+                },
+                error => {console.error('Error updating board:', error);}
+                
+            );
+        } else {
+            console.log(this.params.value);
+            //add board
+            const newBoard: any = {
+                boardId: null,
+                boardName: this.params.value.boardName,
+                description: this.params.value.description,
+                accessLevel: this.params.value.accessLevel,
+              };
+            this.boardService.newBoard(
+                1,
+                2,
+                newBoard
+                )
+            .subscribe(
+                response => {
+                    console.log('Board added successfully:', response);
+                    this.getAllBoards();
+                },
+                error => {console.error('Error adding board:', error);}
+                
+            );
+            
         }
 
         this.showMessage('Note has been saved successfully.');
-        this.isAddNoteModal.close();
-        this.searchNotes();
+        this.isAddBoardModal.close();
     }
 
     tabChanged(type: string) {
         this.selectedTab = type;
-        this.searchNotes();
+        this.getAllBoards();
         this.isShowNoteMenu = false;
     }
 
-    setFav(note: any) {
-        let item = this.filterdNotesList.find((d: { id: any }) => d.id === note.id);
-        item.isFav = !item.isFav;
-        this.searchNotes();
+    setFav(board: Board) {
+        board.fav = !board.fav;
+        this.boardService.updateBoard(
+            board.boardId,
+            board
+            )
+        .subscribe(
+            response => {
+                console.log('Board updated successfully:', response);
+                this.getAllBoards();
+            },
+            error => {console.error('Error updating board:', error);}
+        );
     }
 
-    setTag(note: any, name: string = '') {
-        let item = this.filterdNotesList.find((d: { id: any }) => d.id === note.id);
-        item.tag = name;
-        this.searchNotes();
+    setAccessLevel(board: Board, accessLevel: string) {
+        board.accessLevel = this.stringToAccessLevel(accessLevel);
+        this.boardService.updateBoard(
+            board.boardId,
+            board
+            )
+        .subscribe(
+            response => {
+                console.log('Board updated successfully:', response);
+                this.getAllBoards();
+            },
+            error => {console.error('Error updating board:', error);}
+        );
     }
 
-    deleteNoteConfirm(note: any) {
+    deleteBoardConfirm(board: any) {
         setTimeout(() => {
-            this.deletedNote = note;
-            this.isDeleteNoteModal.open();
+            this.deletedBoard = board;
+            this.isDeleteBoardModal.open();
         });
     }
 
-    viewNote(note: any) {
+    viewBoard(board: any) {
         setTimeout(() => {
-            this.selectedNote = note;
-            this.isViewNoteModal.open();
+            this.selectedBoard = board;
+            this.isViewBoardModal.open();
         });
     }
 
-    editNote(note: any = null) {
+    editBoard(board: any = null) {
         this.isShowNoteMenu = false;
-        this.isAddNoteModal.open();
+        this.isAddBoardModal.open();
         this.initForm();
-        if (note) {
+        if (board) {
             this.params.setValue({
-                id: note.id,
-                title: note.title,
-                description: note.description,
-                tag: note.tag,
-                user: note.user,
-                thumb: note.thumb,
+                boardId: board.boardId,
+                boardName: board.boardName,
+                description: board.description,
+                fav: board.fav,
+                accessLevel: board.accessLevel
             });
         }
     }
 
-    deleteNote() {
-        this.notesList = this.notesList.filter((d: { id: any }) => d.id != this.deletedNote.id);
-        this.searchNotes();
-        this.showMessage('Note has been deleted successfully.');
-        this.isDeleteNoteModal.close();
+    deleteBoard() {
+        this.boardService.deleteBoard(this.deletedBoard.boardId).subscribe({
+            next: () => {
+                console.log('Board user after next');
+                this.filterdBoardsList = this.filterdBoardsList.filter((b) => b.boardId !== this.deletedBoard.boardId);
+                this.showMessage('Board has been deleted successfully.');
+                console.log('Board deleted successfully:');
+                this.isDeleteBoardModal.close();
+            },
+            error: (err) => {
+                console.error('Error deleting member:', err);
+            },
+        });
     }
 
     showMessage(msg = '', type = 'success') {
@@ -376,4 +239,15 @@ export class BoardsComponent {
             padding: '10px 20px',
         });
     }
+
+    stringToAccessLevel(value: string): AccessLevel {
+        switch (value.toUpperCase()) {
+          case 'PRIVATE':
+            return AccessLevel.PRIVATE;
+          case 'PUBLIC':
+            return AccessLevel.PUBLIC;
+          default:
+            throw new Error(`Invalid access level: ${value}`);
+        }
+      }
 }

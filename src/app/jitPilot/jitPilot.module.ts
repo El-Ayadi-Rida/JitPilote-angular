@@ -4,7 +4,6 @@ import { Routes, RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 // modal
-import { ModalModule } from 'angular-custom-modal';
 
 // sortable
 import { SortablejsModule } from '@dustfoundation/ngx-sortablejs';
@@ -36,6 +35,7 @@ import { MembersComponent } from './components/Members/members';
 import { TodolistComponent } from './components/TododList/todolist';
 import { CalendarComponent } from './components/Calendar/calendar';
 import { WorkspaceComponent } from './components/workspace/workspace.component';
+import { ModalModule } from 'angular-custom-modal';
 
 const routes: Routes = [
     { path: 'jitPilot/scrumboard/:boardId', component: BoardDetailsComponent, title: 'Scrumboard | JitPilot' },
