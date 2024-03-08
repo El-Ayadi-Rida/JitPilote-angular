@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { workspace } from '../models/workspace';
+import { environment } from 'src/environments/environment.development';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -11,24 +12,25 @@ export class WorkspaceService {
   constructor(private http: HttpClient) { }
 
   getAllWorkspace(): Observable<workspace[]> {
-    return this.http.get<workspace[]>(`http://localhost:8080/api/workspaces`);
+    return this.http.get<workspace[]>(`${environment.URL_API}workspaces`);
   }
+  
 
   deleteWorkspace(id: number): Observable<workspace> {
-    return this.http.delete<workspace>(`http://localhost:8080/api/workspaces/${id}`);
+    return this.http.delete<workspace>(`${environment.URL_API}workspaces/${id}`);
   }
 
 
   getWorkspaceById(id: number): Observable<workspace> {
-    return this.http.get<workspace>(`http://localhost:8080/api/workspaces/${id}`);
+    return this.http.get<workspace>(`${environment.URL_API}workspaces/${id}`);
   }
 
-  create(data: workspace): Observable<workspace> {
-    return this.http.post<workspace>(`http://localhost:8080/api/workspaces`, data);
+  create(id: number, data: workspace): Observable<workspace> {
+    return this.http.post<workspace>(`${environment.URL_API}workspaces/user/${id}`, data);
   }
 
   update(id: number, data: workspace): Observable<workspace> {
-    return this.http.put<workspace>(`http://localhost:8080/api/workspaces/${id}`, data);
+    return this.http.put<workspace>(`${environment.URL_API}workspaces/${id}`, data);
   }
 
 

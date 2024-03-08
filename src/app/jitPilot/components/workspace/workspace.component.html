@@ -21,13 +21,28 @@
                         </div>
                         <div>
                             <label for="description">description</label>
-                            <input id="description" [(ngModel)]="paramms.description" name="description" type="text" class="form-input mt-1" placeholder="Enter description" />
+                            <!-- <input 
+                            id="description" 
+                            [(ngModel)]="paramms.description" 
+                            name="description" 
+                            type="textarea" 
+                            class="form-textarea mt-1" 
+                            placeholder="Enter description" /> -->
+                            <textarea
+                                                            id="description" 
+                            [(ngModel)]="paramms.description" 
+                            name="description" 
+                            type="textarea" 
+                            class="form-textarea mt-1" 
+                            placeholder="Enter description"
+                            
+                            ></textarea>
                         </div>
                     </div>
     
                     <div class="mt-8 flex items-center justify-end">
                         <button type="button" class="btn btn-outline-danger" (click)="isAddWorkspaceModal.close()">Cancel</button>
-                        <button type="submit" class="btn btn-primary ltr:ml-4 rtl:mr-4">{{ paramms.workspaceId ? 'Update' : 'Add' }}</button>
+                        <button type="submit" class="btn btn-success ltr:ml-4 rtl:mr-4">{{ paramms.workspaceId ? 'Update' : 'Add' }}</button>
                     </div>
                 </form>
             </ng-template>
@@ -37,9 +52,9 @@
 
 
 
-        <div class="panel h-full flex-1 overflow-auto">
+        <div>
             <div>
-                <button type="button" class="btn btn-primary flex" (click)="addEditWorkspace()">
+                <button type="button" class="btn btn-success flex" (click)="addEditWorkspace()">
                     <icon-plus class="h-5 w-5 ltr:mr-3 rtl:ml-3" />
                     Add Workspace
                 </button>
@@ -56,14 +71,14 @@
                 <div class="min-h-[400px] sm:min-h-[300px]">
                     <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
                         <ng-container *ngFor="let works of workspace">
-                            <div class="panel pb-12">
-                                <div class="-m-5 mb-5 flex items-center justify-between border-b border-[#e0e6ed] p-5 dark:border-[#1b2e4b]">
+                            <div class="panel pb-1" >
+                                <div class="-m-5 mb-5 flex items-center justify-between  border-[#e0e6ed] p-5 dark:border-[#1b2e4b]">
                                     <a href="javascript:;" class="flex font-semibold">
-                                        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-secondary text-white ltr:mr-4 rtl:ml-4">
+                                        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-dark text-white ltr:mr-4 rtl:ml-4">
                                             <span>{{ works.name.slice(0, 2).toUpperCase() }}</span>
                                         </div>
                                         <div>
-                                            <h3 class="max-w-lg text-xl font-semibold leading-normal text-gray-900 dark:text-dark">{{ works.name  }}</h3>
+                                            <h3 class="text-base max-w-lg text-xl font-semibold leading-normal text-gray-900 dark:text-dark">{{ works.name  }}</h3>
 
 
                                             <p class="mt-1 text-xs text-white-dark">JobInTech</p>
@@ -91,13 +106,6 @@
                                     </div>
                                 
                                     
-                                </div>
-                                <div class="group">
-                                    <div class="mb-5">
-                                        <div class="text-white-dark">
-                                            {{ works.description }}            
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
                         </ng-container>

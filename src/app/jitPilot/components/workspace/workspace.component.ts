@@ -130,7 +130,7 @@ export class WorkspaceComponent implements OnInit{
                 description: this.paramms.description,
               };
             
-              this.workspaceServie.create(newWorkspace).subscribe(
+              this.workspaceServie.create(1,newWorkspace).subscribe(
                 (addedCategory) => {
                   this.workspace.push(addedCategory);
                   this.showMessage('workspace has been saved successfully.');
