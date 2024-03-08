@@ -3,8 +3,8 @@
         <div class="h-full bg-white dark:bg-[#0e1726]">
             <div class="flex items-center justify-between px-4 py-3">
                 <a routerLink="/" class="main-logo flex shrink-0 items-center">
-                    <img class="ml-[5px] w-8 flex-none" src="/assets/images/logo.svg" alt="" />
-                    <span class="align-middle text-2xl font-semibold ltr:ml-1.5 rtl:mr-1.5 dark:text-white-light lg:inline">VRISTO</span>
+                    <img class="ml-[5px] w-8 flex-none" src="/assets/images/logo/favicon.svg" alt="" />
+                    <span class="align-middle text-2xl font-semibold ltr:ml-1.5 rtl:mr-1.5 dark:text-white-light lg:inline">JITECHPILOT</span>
                 </a>
                 <a
                     href="javascript:;"
@@ -19,7 +19,7 @@
                     <li class="nav-item">
                         <a routerLink="/jitPilot/workspaces" class="group" routerLinkActive="active" (click)="toggleMobileMenu()">
                             <div class="flex items-center">
-                                <icon-menu-notes class="shrink-0 group-hover:!text-primary" />
+                                <icon-box class="shrink-0 group-hover:!text-primary" />
 
                                 <span class="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark"
                                     >{{ 'Workspace List' | translate }}</span
@@ -30,7 +30,7 @@
                     <li class="nav-item">
                         <a routerLink="/jitPilot/boards" class="group" routerLinkActive="active" (click)="toggleMobileMenu()">
                             <div class="flex items-center">
-                                <icon-menu-notes class="shrink-0 group-hover:!text-primary" />
+                                <icon-chart-square class="shrink-0 group-hover:!text-primary" />
 
                                 <span class="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark"
                                     >{{ 'Boards' | translate }}</span
@@ -41,7 +41,7 @@
                     <li class="nav-item">
                         <a routerLink="/jitPilot/members" class="group" routerLinkActive="active" (click)="toggleMobileMenu()">
                             <div class="flex items-center">
-                                <icon-menu-contacts class="shrink-0 group-hover:!text-primary" />
+                                <icon-users-group class="shrink-0 group-hover:!text-primary" />
 
                                 <span class="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark"
                                     >{{ 'Members' | translate }}</span
@@ -56,7 +56,7 @@
                     <li class="nav-item">
                         <a routerLink="/jitPilot/todolist" class="group" routerLinkActive="active" (click)="toggleMobileMenu()">
                             <div class="flex items-center">
-                                <icon-menu-todo class="shrink-0 group-hover:!text-primary" />
+                                <icon-list-check class="shrink-0 group-hover:!text-primary" />
 
                                 <span class="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark"
                                     >{{ 'todo_list' | translate }}</span
@@ -67,7 +67,7 @@
                     <li class="nav-item">
                         <a routerLink="/jitPilot/calendar" class="group" routerLinkActive="active" (click)="toggleMobileMenu()">
                             <div class="flex items-center">
-                                <icon-menu-calendar class="shrink-0 group-hover:!text-primary" />
+                                <icon-calendar class="shrink-0 group-hover:!text-primary" />
 
                                 <span class="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark"
                                     >{{ 'calendar' | translate }}</span

@@ -16,7 +16,7 @@ export const routes: Routes = [
         component: AppLayout,
         children: [
             // dashboard
-            { path: '', component: IndexComponent, title: 'Sales Admin | VRISTO - Multipurpose Tailwind Dashboard Template' },
+            { path: '', component: IndexComponent, title: 'JITECHPILOT - PROJECT MANAGER' },
 
 
             //apps

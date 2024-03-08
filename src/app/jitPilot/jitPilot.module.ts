@@ -32,7 +32,7 @@ import { IconModule } from 'src/app/shared/icon/icon.module';
 
 import { BoardDetailsComponent } from './components/Board/boardDetails';
 import { BoardsComponent } from './components/Board/boards';
-import { MembersComponent } from './components/Members/members';
+import { MembersComponent } from './components/members/members';
 import { TodolistComponent } from './components/TododList/todolist';
 import { CalendarComponent } from './components/Calendar/calendar';
 import { WorkspaceComponent } from './components/workspace/workspace.component';
