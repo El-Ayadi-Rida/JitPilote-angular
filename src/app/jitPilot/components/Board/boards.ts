@@ -7,6 +7,7 @@ import { Board } from '../../models/board';
 import { BoardPage } from '../../models/board-page';
 import { BoardService } from '../../services/board.service';
 import { AccessLevel } from '../../models/access-level';
+import { Router } from '@angular/router';
 
 @Component({
     moduleId: module.id,
@@ -19,7 +20,7 @@ import { AccessLevel } from '../../models/access-level';
     ],
 })
 export class BoardsComponent {
-    constructor(public fb: FormBuilder , private boardService:BoardService) {}
+    constructor(public fb: FormBuilder , private boardService:BoardService ,private router: Router) {}
     defaultParams = {
         boardId: null,
         boardName: '',
@@ -191,7 +192,12 @@ export class BoardsComponent {
     viewBoard(board: any) {
         setTimeout(() => {
             this.selectedBoard = board;
-            this.isViewBoardModal.open();
+            if (this.selectedBoard.accessLevel !== AccessLevel.PRIVATE) {
+                this.router.navigate([`/jitPilot/scrumboard/${this.selectedBoard.boardId}`]);
+            } else {
+                this.isViewBoardModal.open();  
+            }
+  
         });
     }
 

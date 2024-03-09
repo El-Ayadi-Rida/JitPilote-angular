@@ -26,4 +26,7 @@ updateBoard(boardId: number,board:Board):Observable<Board>{
 deleteBoard(boardId: number):Observable<Board>{
   return this.http.delete<Board>(`${environment.URL_API}/boards/${boardId}`);
 }
+getBoardById(boardId: number):Observable<Board>{
+  return this.http.get<Board>(`${environment.URL_API}/boards/${boardId}`);
+}
 }

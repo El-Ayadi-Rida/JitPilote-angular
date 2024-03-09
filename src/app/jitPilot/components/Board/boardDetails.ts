@@ -1,7 +1,12 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import Swal from 'sweetalert2';
 import { animate, style, transition, trigger } from '@angular/animations';
 import { ModalComponent } from 'angular-custom-modal';
+import { ActivatedRoute } from '@angular/router';
+import { BoardService } from '../../services/board.service';
+import { FormBuilder } from '@angular/forms';
+import { Board } from '../../models/board';
+import { Section } from '../../models/section';
 
 @Component({
     moduleId: module.id,
@@ -13,8 +18,18 @@ import { ModalComponent } from 'angular-custom-modal';
         ]),
     ],
 })
-export class BoardDetailsComponent {
-    constructor() {}
+export class BoardDetailsComponent implements OnInit{
+    constructor(private route: ActivatedRoute,public fb: FormBuilder , private boardService:BoardService) {}
+    ngOnInit(): void {
+        this.route.params.subscribe(params => {
+            this.boardId = params['boardId'];            
+          });
+          this.getBoardById();
+    }
+    boardId:number=0;
+    currentBoard!: Board;
+    boardName!:string;
+    sectionList!: Section[];
     params = {
         id: null,
         title: '',
@@ -93,7 +108,19 @@ export class BoardDetailsComponent {
             tasks: [],
         },
     ];
-
+    getBoardById(){
+        this.boardService.getBoardById(this.boardId)
+                        .subscribe(
+                            response => {
+                                this.currentBoard = response;
+                                this.sectionList = this.currentBoard.sections;
+                                this.boardName =this.currentBoard.boardName;
+                                console.log(this.sectionList);
+                                
+                            },
+                            error => {console.error('Error geting board:', error);}
+                        );
+    }
     addEditProject(project: any = null) {
         setTimeout(() => {
             this.params = {

@@ -1,4 +1,5 @@
 import { AccessLevel } from "./access-level";
+import { Section } from "./section";
 
 export interface Board {
     boardId: number;
@@ -7,4 +8,5 @@ export interface Board {
     startDate: Date;
     fav:boolean;
     accessLevel:AccessLevel;
+    sections:Section[];
 }

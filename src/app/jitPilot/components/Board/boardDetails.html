@@ -1,4 +1,12 @@
 <div>
+    <ul class="flex space-x-2 rtl:space-x-reverse">
+        <li>
+            <a routerLink="/jitPilot/boards" class="text-primary hover:underline">Boards</a>
+        </li>
+        <li class="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
+            <span>{{boardName}}</span>
+        </li>
+    </ul>
     <div>
         <button type="button" class="btn btn-primary flex" (click)="addEditProject()">
             <icon-plus class="h-5 w-5 ltr:mr-3 rtl:ml-3" />
@@ -10,13 +18,13 @@
     <div class="relative pt-5">
         <div class="-mx-2 h-full">
             <div class="flex flex-nowrap items-start gap-5 overflow-x-auto px-2 pb-2">
-                <ng-container *ngFor="let project of projectList" key="project.id">
+                <ng-container *ngFor="let section of sectionList" key="section.id">
                     <div class="panel w-80 flex-none">
                         <div class="mb-5 flex justify-between">
-                            <h4 class="text-base font-semibold">{{ project.title }}</h4>
+                            <h4 class="text-base font-semibold">{{ section.sectionTitle }}</h4>
 
                             <div class="flex items-center">
-                                <button type="button" class="hover:text-primary ltr:mr-2 rtl:ml-2" (click)="addEditTask(project.id)">
+                                <button type="button" class="hover:text-primary ltr:mr-2 rtl:ml-2" (click)="addEditTask(section.sectionId)">
                                     <icon-plus-circle />
                                 </button>
                                 <div hlMenu class="dropdown">
@@ -25,10 +33,10 @@
                                     </button>
                                     <ul *hlMenuItems @toggleAnimation class="ltr:right-0 rtl:left-0">
                                         <li>
-                                            <a href="javascript:;" *hlMenuItem="let menuItem" (click)="addEditProject(project)">Edit</a>
+                                            <a href="javascript:;" *hlMenuItem="let menuItem" (click)="addEditProject(section)">Edit</a>
                                         </li>
-                                        <li><a href="javascript:;" *hlMenuItem="let menuItem" (click)="deleteProject(project)">Delete</a></li>
-                                        <li><a href="javascript:;" *hlMenuItem="let menuItem" (click)="clearProjects(project)">Clear All</a></li>
+                                        <li><a href="javascript:;" *hlMenuItem="let menuItem" (click)="deleteProject(section)">Delete</a></li>
+                                        <li><a href="javascript:;" *hlMenuItem="let menuItem" (click)="clearProjects(section)">Clear All</a></li>
                                     </ul>
                                 </div>
                             </div>
@@ -36,44 +44,44 @@
 
                         <!-- task list -->
                         <div
-                            [sortablejs]="project.tasks"
+                            [sortablejs]="section.tickets"
                             [sortablejsOptions]="{ animation: 200, group: 'default', ghostClass: 'sortable-ghost', dragClass:'sortable-drag' }"
                             class="connect-sorting-content min-h-[150px]"
                         >
-                            <div class="sortable-list" *ngFor="let task of project.tasks" key="project.id + '' + task.id">
+                            <div class="sortable-list" *ngFor="let ticket of section.tickets" key="section.sectionId + '' + ticket.ticketId">
                                 <div class="mb-5 cursor-move space-y-3 rounded-md bg-[#f4f4f4] p-3 pb-5 shadow dark:bg-white-dark/20">
-                                    <ng-container *ngIf="task.image">
+                                    <ng-container *ngIf="ticket.title">
                                         <img src="/assets/images/carousel1.jpeg" alt="images" class="h-32 w-full rounded-md object-cover" />
                                     </ng-container>
-                                    <div class="text-base font-medium">{{ task.title }}</div>
-                                    <p class="break-all">{{ task.description }}</p>
+                                    <div class="text-base font-medium">{{ ticket.title }}</div>
+                                    <p class="break-all">{{ ticket.description }}</p>
                                     <div class="flex flex-wrap items-center gap-2">
-                                        <ng-container *ngIf="task.tags?.length; else elseBlock">
-                                            <ng-container *ngFor="let tag of task.tags; index as i" key="i">
+                                        <ng-container *ngIf="ticket.priority !== 'LOW'; else elseBlock">
                                                 <div class="btn btn-outline-primary flex px-2 py-1">
                                                     <icon-tag class="shrink-0" />
 
-                                                    <span class="ltr:ml-2 rtl:mr-2">{{ tag }}</span>
+                                                    <span class="ltr:ml-2 rtl:mr-2">{{ ticket.priority }}</span>
                                                 </div>
-                                            </ng-container>
-                                        </ng-container>
+                                           
+                                        </ng-container> 
                                         <ng-template #elseBlock>
                                             <div class="btn flex px-2 py-1 text-white-dark shadow-none dark:border-white-dark/50">
                                                 <icon-tag class="shrink-0" />
-                                                <span class="ltr:ml-2 rtl:mr-2">No Tags</span>
+                                                <span class="ltr:ml-2 rtl:mr-2">{{ ticket.priority }}</span>
                                             </div>
                                         </ng-template>
+                                        
                                     </div>
                                     <div class="flex items-center justify-between">
                                         <div class="flex items-center font-medium hover:text-primary">
                                             <icon-calendar class="shrink-0 ltr:mr-3 rtl:ml-3" />
-                                            <span>{{ task.date }}</span>
+                                            <span>{{ ticket.status }}</span>
                                         </div>
                                         <div class="flex items-center">
-                                            <button type="button" class="hover:text-info" (click)="addEditTask(project.id, task)">
+                                            <button type="button" class="hover:text-info" (click)="addEditTask(section.sectionId, ticket)">
                                                 <icon-edit class="ltr:mr-3 rtl:ml-3" />
                                             </button>
-                                            <button type="button" class="hover:text-danger" (click)="deleteConfirmModal(project.id, task)">
+                                            <button type="button" class="hover:text-danger" (click)="deleteConfirmModal(section.sectionId, ticket)">
                                                 <icon-trash-lines />
                                             </button>
                                         </div>
@@ -83,7 +91,7 @@
                         </div>
 
                         <div class="pt-3">
-                            <button type="button" class="btn btn-primary mx-auto" (click)="addEditTask(project.id)">
+                            <button type="button" class="btn btn-primary mx-auto" (click)="addEditTask(section.sectionId)">
                                 <icon-plus />
                                 Add Task
                             </button>
@@ -117,27 +125,27 @@
     </modal>
 
     <!-- add task modal -->
-    <modal #isAddTaskModal class="no-footer">
+    <!-- <modal #isAddTaskModal class="no-footer">
         <ng-template #modalHeader>
-            <div class="!font-medium">{{ paramsTask.id ? 'Edit Task' : 'Add Task' }}</div>
+            <div class="!font-medium">{{ paramsticket.id ? 'Edit Task' : 'Add Task' }}</div>
         </ng-template>
         <ng-template #modalBody>
             <form (ngSubmit)="saveTask()" class="text-sm">
                 <div class="grid gap-5">
                     <div>
                         <label for="taskTitle">Name</label>
-                        <input id="taskTitle" [(ngModel)]="paramsTask.title" name="title" type="text" class="form-input" placeholder="Enter Name" />
+                        <input id="taskTitle" [(ngModel)]="paramsticket.title" name="title" type="text" class="form-input" placeholder="Enter Name" />
                     </div>
 
                     <div>
                         <label for="taskTag">Tag</label>
-                        <input id="taskTag" [(ngModel)]="paramsTask.tags" name="tags" type="text" class="form-input" placeholder="Enter Tag" />
+                        <input id="taskTag" [(ngModel)]="paramsticket.tags" name="tags" type="text" class="form-input" placeholder="Enter Tag" />
                     </div>
                     <div>
                         <label for="taskdesc">Description</label>
                         <textarea
                             id="taskdesc"
-                            [(ngModel)]="paramsTask.description"
+                            [(ngModel)]="paramsticket.description"
                             name="description"
                             class="form-textarea min-h-[130px]"
                             placeholder="Enter Description"
@@ -147,11 +155,11 @@
 
                 <div class="mt-8 flex items-center justify-end">
                     <button type="button" class="btn btn-outline-danger" (click)="isAddTaskModal.close()">Cancel</button>
-                    <button type="submit" class="btn btn-primary ltr:ml-4 rtl:mr-4">{{ paramsTask.id ? 'Update' : 'Add' }}</button>
+                    <button type="submit" class="btn btn-primary ltr:ml-4 rtl:mr-4">{{ paramsticket.id ? 'Update' : 'Add' }}</button>
                 </div>
             </form>
         </ng-template>
-    </modal>
+    </modal> -->
 
     <!-- delete task modal -->
     <modal #isDeleteModal class="no-footer">
