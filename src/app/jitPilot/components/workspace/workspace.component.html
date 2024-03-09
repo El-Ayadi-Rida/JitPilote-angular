@@ -42,7 +42,7 @@
     
                     <div class="mt-8 flex items-center justify-end">
                         <button type="button" class="btn btn-outline-danger" (click)="isAddWorkspaceModal.close()">Cancel</button>
-                        <button type="submit" class="btn btn-success ltr:ml-4 rtl:mr-4">{{ paramms.workspaceId ? 'Update' : 'Add' }}</button>
+                        <button type="submit" class="btn bg-lime-800 hover:bg-lime-700 text-white ltr:ml-4 rtl:mr-4">{{ paramms.workspaceId ? 'Update' : 'Add' }}</button>
                     </div>
                 </form>
             </ng-template>
@@ -54,8 +54,9 @@
 
         <div>
             <div>
-                <button type="button" class="btn btn-success flex" (click)="addEditWorkspace()">
-                    <icon-plus class="h-5 w-5 ltr:mr-3 rtl:ml-3" />
+               
+                <button class="btn bg-lime-800 hover:bg-lime-700 text-white flex " type="button" (click)="addEditWorkspace()">
+                    <icon-plus class="h-5 w-5 shrink-0 ltr:mr-3 rtl:ml-3" />
                     Add Workspace
                 </button>
             </div>
@@ -101,6 +102,13 @@
                                                     Delete
                                                 </a>
                                                 
+                                            </li>
+                                            <li>
+                                                <a href="javascript:;" class="w-full" *hlMenuItem="let menuItem" (click)="viewWorkspace(works.workspaceId)">
+                                                    <icon-eye class="h-4.5 w-4.5 shrink-0 ltr:mr-3 rtl:ml-3" />
+
+                                                    View
+                                                </a>
                                             </li>
                                         </ul>
                                     </div>

@@ -36,6 +36,7 @@ import { CalendarComponent } from './components/Calendar/calendar';
 import { WorkspaceComponent } from './components/workspace/workspace.component';
 import { ModalModule } from 'angular-custom-modal';
 import { MembersComponent } from './components/Members/members';
+import { WorkspaceDetailsComponent } from './components/workspace/workspaceDetails';
 
 const routes: Routes = [
     { path: 'jitPilot/scrumboard/:boardId', component: BoardDetailsComponent, title: 'Scrumboard | JitPilot' },
@@ -44,6 +45,8 @@ const routes: Routes = [
     { path: 'jitPilot/todolist', component: TodolistComponent, title: 'Todolist | JitPilot' },
     { path: 'jitPilot/calendar', component: CalendarComponent, title: 'Calendar | JitPilot' },
     { path: 'jitPilot/workspaces', component: WorkspaceComponent, title: 'WorkSpace | JitPilot' },
+    { path: 'jitPilot/workspace/:workspaceId/boards', component: WorkspaceDetailsComponent, title: 'Boards | JitPilot' },
+
 ];
 
 @NgModule({
@@ -72,6 +75,7 @@ const routes: Routes = [
         TodolistComponent,
         CalendarComponent,
         WorkspaceComponent,
+        WorkspaceDetailsComponent
 
     ],
 })

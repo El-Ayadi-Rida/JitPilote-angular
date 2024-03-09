@@ -7,6 +7,7 @@ import { ModalComponent } from 'angular-custom-modal';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { workspace } from '../../models/workspace';
 import { WorkspaceService } from '../../services/workspace.service';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -25,7 +26,7 @@ import { WorkspaceService } from '../../services/workspace.service';
 export class WorkspaceComponent implements OnInit{
 
   workspace! : workspace[]
-  constructor(public fb: FormBuilder,private workspaceServie:WorkspaceService){}
+  constructor(public fb: FormBuilder,private workspaceServie:WorkspaceService, private router: Router){}
     
     paramms = {
             workspaceId: null,
@@ -39,7 +40,8 @@ export class WorkspaceComponent implements OnInit{
     //@ViewChild('isViewNoteModal') isViewNoteModal!: ModalComponent;
     isShowWorkspaceMenu = false;
    
-    
+    selectedWorkspace: any = null;
+
     selectedTab: any = 'all';
   
 
@@ -146,6 +148,15 @@ export class WorkspaceComponent implements OnInit{
 
     
 
+    viewWorkspace(workspaceId:number) {
+      setTimeout(() => {
+         // this.selectedWorkspace = workspace;
+          this.router.navigate([`/jitPilot/workspace/${workspaceId}/boards`]);
+              
+         
+
+      });
+  }
 
    
 

@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { workspace } from '../models/workspace';
 import { environment } from 'src/environments/environment.development';
 import { Observable } from 'rxjs';
+import { Board } from '../models/board';
 
 @Injectable({
   providedIn: 'root'
@@ -33,5 +34,8 @@ export class WorkspaceService {
     return this.http.put<workspace>(`${environment.URL_API}/workspaces/${id}`, data);
   }
 
+  getBoardByWorkspaceId(workspacedId: number):Observable<Board[]>{
+    return this.http.get<Board[]>(`${environment.URL_API}/boards/w/${workspacedId}`);
+  }
 
 }
