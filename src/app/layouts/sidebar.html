@@ -61,7 +61,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a routerLink="/jitPilot/members" class="group" routerLinkActive="active" (click)="toggleMobileMenu()">
+                            <a [routerLink]="['/jitPilot/members', workspace.workspaceId, 'members']" class="group" routerLinkActive="active" (click)="toggleMobileMenu()">
                                 <div class="flex items-center">
                                     <icon-users-group class="shrink-0 group-hover:!text-primary" />
     

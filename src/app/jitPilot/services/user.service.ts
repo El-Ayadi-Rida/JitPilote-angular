@@ -37,4 +37,8 @@ export class UserService {
         const url = `${this.apiUrl}/${id}`;
         return this.http.delete<void>(url);
     }
+
+    getUserByWorkspace(workspacedId:number): Observable<UserResponse[]> {
+        return this.http.get<UserResponse[]>(`${environment.URL_API}/workspaces/${workspacedId}/users`);
+    }
 }

@@ -23,6 +23,8 @@ import {
 import {
     UserService
 } from '../../services/user.service';
+import { ActivatedRoute, Router } from '@angular/router';
+
 
 @Component({
     moduleId: module.id,
@@ -44,13 +46,19 @@ import {
     ],
 })
 export class MembersComponent {
-    constructor(public fb: FormBuilder, private userService: UserService) {}
+    constructor(public fb: FormBuilder, 
+        private userService: UserService,
+        private router: Router,
+        private route: ActivatedRoute,) {}
+
     displayType = 'grid';
     @ViewChild('addContactModal') addContactModal!: ModalComponent;
     params!: FormGroup;
     filteredMembersList: UserResponse[] = [];
     memberList: UserResponse[] = [];
     searchUser = '';
+    workspaceId!: number;
+
 
 
     initForm() {
@@ -65,12 +73,16 @@ export class MembersComponent {
     }
 
     ngOnInit() {
+        this.route.params.subscribe(params => {
+            this.workspaceId = params['workspaceId'];    
+            console.log("hhhhhh",this.workspaceId);        
+          });
         this.searchContacts();
         this.getUsers();
     }
 
     getUsers(): void {
-        this.userService.getUsers().subscribe((data: UserResponse[]) => {
+        this.userService.getUserByWorkspace(this.workspaceId).subscribe((data: UserResponse[]) => {
             this.memberList = data;
             this.filteredMembersList = data;
             console.log(data);

@@ -40,7 +40,7 @@ import { WorkspaceDetailsComponent } from './components/workspace/workspaceDetai
 
 const routes: Routes = [
     { path: 'jitPilot/scrumboard/:boardId', component: BoardDetailsComponent, title: 'Scrumboard | JitPilot' },
-    { path: 'jitPilot/members', component: MembersComponent, title: 'Members | JitPilot' },
+    { path: 'jitPilot/members/:workspaceId/members', component: MembersComponent, title: 'Members | JitPilot' },
     { path: 'jitPilot/board/:workspaceId/boards', component: BoardsComponent, title: 'Boards | JitPilot' },
     { path: 'jitPilot/todolist', component: TodolistComponent, title: 'Todolist | JitPilot' },
     { path: 'jitPilot/calendar', component: CalendarComponent, title: 'Calendar | JitPilot' },
