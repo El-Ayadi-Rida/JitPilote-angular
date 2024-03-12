@@ -56,9 +56,15 @@
         <setting></setting>
         <!-- END APP SETTING LAUNCHER -->
 
-        <div class="main-container min-h-screen text-black dark:text-white-dark" [ngClass]="[store.navbar]">
+        <div class=" min-h-screen text-black dark:text-white-dark" 
+        [ngClass]="[store.navbar]"
+        [ngClass]="{
+            'main-container': !isJitPilotWorkspacesRoute(),
+            'container': isJitPilotWorkspacesRoute()
+        }"
+        >
             <!--  BEGIN SIDEBAR  -->
-            <sidebar></sidebar>
+            <sidebar *ngIf="!isJitPilotWorkspacesRoute()"></sidebar>
             <!--  END SIDEBAR  -->
 
             <div class="main-content flex flex-col min-h-screen">

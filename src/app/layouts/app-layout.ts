@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { AppService } from '../service/app.service';
-import { Router, NavigationEnd, Event as RouterEvent } from '@angular/router';
+import { Router, NavigationEnd, Event as RouterEvent, ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 
 @Component({
@@ -11,11 +11,21 @@ import { TranslateService } from '@ngx-translate/core';
 export class AppLayout {
     store: any;
     showTopButton = false;
-    constructor(public translate: TranslateService, public storeData: Store<any>, private service: AppService, private router: Router) {
+    constructor(
+        public translate: TranslateService, 
+        public storeData: Store<any>, 
+        private service: AppService, 
+        private router: Router,
+        private route: ActivatedRoute
+        ) {
         this.initStore();
     }
     headerClass = '';
     ngOnInit() {
+        this.route.params.subscribe(params => {
+            console.log(params);
+                   
+          });
         this.initAnimation();
         this.toggleLoader();
         window.addEventListener('scroll', () => {
@@ -64,4 +74,8 @@ export class AppLayout {
         document.body.scrollTop = 0;
         document.documentElement.scrollTop = 0;
     }
+    
+    isJitPilotWorkspacesRoute(): boolean {
+        return this.router.url === '/';
+      }
 }

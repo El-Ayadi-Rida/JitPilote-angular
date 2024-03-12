@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { $themeConfig } from '../theme.config';
 import { TranslateService } from '@ngx-translate/core';
+import { BehaviorSubject } from 'rxjs';
+import { workspace } from '../jitPilot/models/workspace';
 
 @Injectable()
 export class AppService {
@@ -94,4 +96,14 @@ export class AppService {
             }
         }
     }
+
+    ////////////////// passing workspace data between components
+    workspaceD!: workspace;
+    private workspaceSource = new BehaviorSubject<workspace>(this.workspaceD);
+    currentWorspace = this.workspaceSource.asObservable();
+
+    selectWorkspace(workspace:workspace){
+        this.workspaceSource.next(workspace);
+    }
+
 }

@@ -41,10 +41,9 @@ import { WorkspaceDetailsComponent } from './components/workspace/workspaceDetai
 const routes: Routes = [
     { path: 'jitPilot/scrumboard/:boardId', component: BoardDetailsComponent, title: 'Scrumboard | JitPilot' },
     { path: 'jitPilot/members', component: MembersComponent, title: 'Members | JitPilot' },
-    { path: 'jitPilot/boards', component: BoardsComponent, title: 'Boards | JitPilot' },
+    { path: 'jitPilot/board/:workspaceId/boards', component: BoardsComponent, title: 'Boards | JitPilot' },
     { path: 'jitPilot/todolist', component: TodolistComponent, title: 'Todolist | JitPilot' },
     { path: 'jitPilot/calendar', component: CalendarComponent, title: 'Calendar | JitPilot' },
-    { path: 'jitPilot/workspaces', component: WorkspaceComponent, title: 'WorkSpace | JitPilot' },
     { path: 'jitPilot/workspace/:workspaceId/boards', component: WorkspaceDetailsComponent, title: 'Boards | JitPilot' },
 
 ];

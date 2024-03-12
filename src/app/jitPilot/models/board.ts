@@ -1,5 +1,6 @@
 import { AccessLevel } from "./access-level";
 import { Section } from "./section";
+import { workspace } from "./workspace";
 
 export interface Board {
     boardId: number;
@@ -9,4 +10,5 @@ export interface Board {
     fav:boolean;
     accessLevel:AccessLevel;
     sections:Section[];
+    workspace:workspace
 }

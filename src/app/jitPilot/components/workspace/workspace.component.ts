@@ -8,6 +8,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { workspace } from '../../models/workspace';
 import { WorkspaceService } from '../../services/workspace.service';
 import { Router } from '@angular/router';
+import { AppService } from 'src/app/service/app.service';
 
 
 @Component({
@@ -25,8 +26,14 @@ import { Router } from '@angular/router';
 
 export class WorkspaceComponent implements OnInit{
 
-  workspace! : workspace[]
-  constructor(public fb: FormBuilder,private workspaceServie:WorkspaceService, private router: Router){}
+  workspaces! : workspace[];
+  filtredWorkspaces: any = [];
+  constructor(
+    public fb: FormBuilder,
+    private workspaceServie:WorkspaceService, 
+    private router: Router,
+    private appService:AppService
+    ){}
     
     paramms = {
             workspaceId: null,
@@ -40,24 +47,24 @@ export class WorkspaceComponent implements OnInit{
     //@ViewChild('isViewNoteModal') isViewNoteModal!: ModalComponent;
     isShowWorkspaceMenu = false;
    
-    selectedWorkspace: any = null;
+    selectedWorkspace!: workspace;
 
     selectedTab: any = 'all';
   
 
     ngOnInit() {
         this.getAllWorkspace();
+        this.appService.currentWorspace.subscribe(workspacef => this.selectedWorkspace = workspacef); 
     }
 
     getAllWorkspace() {
             this.workspaceServie.getAllWorkspace().subscribe(
               (data)=>{
-                this.workspace = data
+                this.workspaces = data
+                this.filtredWorkspaces = this.workspaces;
                 console.log("data" ,data)
             })
           }
-
-   
 
    
 
@@ -108,13 +115,13 @@ export class WorkspaceComponent implements OnInit{
                 this.workspaceServie.update(this.paramms.workspaceId, works).subscribe(
                   (res) => {
                     console.log('API Response:', res);
-                    const idx = this.workspace.findIndex((WORKS)=>{
+                    const idx = this.workspaces.findIndex((WORKS)=>{
                       this.showMessage('workspace has been updated successfully.');
                       return WORKS.workspaceId== res.workspaceId;
                       
 
                     })  
-                    this.workspace[idx]=res
+                    this.workspaces[idx]=res
                     
                   },
                   (error) => {
@@ -134,7 +141,7 @@ export class WorkspaceComponent implements OnInit{
             
               this.workspaceServie.create(1,newWorkspace).subscribe(
                 (addedCategory) => {
-                  this.workspace.push(addedCategory);
+                  this.workspaces.push(addedCategory);
                   this.showMessage('workspace has been saved successfully.');
                 },
                 (error) => {
@@ -148,12 +155,12 @@ export class WorkspaceComponent implements OnInit{
 
     
 
-    viewWorkspace(workspaceId:number) {
+    viewWorkspace(workspace:workspace) {
       setTimeout(() => {
-         // this.selectedWorkspace = workspace;
-          this.router.navigate([`/jitPilot/workspace/${workspaceId}/boards`]);
-              
-         
+          this.selectedWorkspace = workspace;
+          sessionStorage.setItem("workspaceItem",JSON.stringify(this.selectedWorkspace));
+          this.appService.selectWorkspace(this.selectedWorkspace);
+          this.router.navigate([`/jitPilot/board/${workspace.workspaceId}/boards`]);
 
       });
   }
@@ -164,7 +171,7 @@ export class WorkspaceComponent implements OnInit{
     deleteWorkspace(workspaceId:number) {
         console.log(workspaceId);
             this.workspaceServie.deleteWorkspace(workspaceId).subscribe(() => {
-            this.workspace = this.workspace.filter(works => works.workspaceId !== workspaceId);
+            this.filtredWorkspaces = this.workspaces.filter(works => works.workspaceId !== workspaceId);
             this.showMessage('Note has been deleted successfully.');
             //this.isDeleteWorkspaceModal.close();
           });

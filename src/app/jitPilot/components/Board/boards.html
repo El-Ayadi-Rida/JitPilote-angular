@@ -1,4 +1,15 @@
 <div>
+    <ul class="flex space-x-2 rtl:space-x-reverse">
+        <li>
+            <a routerLink="/" class="text-primary hover:underline">Workspaces</a>
+        </li>
+        <li class="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
+            <span *ngIf="workspace else noWorkspace">{{workspace.name}}</span>
+            <ng-template #noWorkspace>
+            <span>loading ....</span>
+            </ng-template>
+        </li>
+    </ul>
     <div class="relative flex h-full gap-5 sm:h-[calc(100vh_-_150px)]">
         <div
             class="absolute z-10 hidden h-full w-full rounded-md bg-black/60"

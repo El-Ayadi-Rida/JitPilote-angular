@@ -65,13 +65,13 @@
                     <icon-menu />
                 </button>
             </div>
-            <ng-container *ngIf="!workspace.length">
+            <ng-container *ngIf="!filtredWorkspaces.length">
                 <div class="flex h-full min-h-[400px] items-center justify-center text-lg font-semibold sm:min-h-[300px]">No data available</div>
             </ng-container>
             <ng-container >
                 <div class="min-h-[400px] sm:min-h-[300px]">
                     <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
-                        <ng-container *ngFor="let works of workspace">
+                        <ng-container *ngFor="let works of filtredWorkspaces">
                             <div class="panel pb-1" >
                                 <div class="-m-5 mb-5 flex items-center justify-between  border-[#e0e6ed] p-5 dark:border-[#1b2e4b]">
                                     <a href="javascript:;" class="flex font-semibold">
@@ -104,7 +104,7 @@
                                                 
                                             </li>
                                             <li>
-                                                <a href="javascript:;" class="w-full" *hlMenuItem="let menuItem" (click)="viewWorkspace(works.workspaceId)">
+                                                <a href="javascript:;" class="w-full" *hlMenuItem="let menuItem" (click)="viewWorkspace(works)">
                                                     <icon-eye class="h-4.5 w-4.5 shrink-0 ltr:mr-3 rtl:ml-3" />
 
                                                     View

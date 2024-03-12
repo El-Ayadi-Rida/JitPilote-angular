@@ -7,7 +7,9 @@ import { Board } from '../../models/board';
 import { BoardPage } from '../../models/board-page';
 import { BoardService } from '../../services/board.service';
 import { AccessLevel } from '../../models/access-level';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { WorkspaceService } from '../../services/workspace.service';
+import { workspace } from '../../models/workspace';
 
 @Component({
     moduleId: module.id,
@@ -20,7 +22,13 @@ import { Router } from '@angular/router';
     ],
 })
 export class BoardsComponent {
-    constructor(public fb: FormBuilder , private boardService:BoardService ,private router: Router) {}
+    constructor(
+        public fb: FormBuilder , 
+        private boardService:BoardService ,
+        private router: Router,
+        private route: ActivatedRoute,
+        private workspaceService:WorkspaceService
+        ) {}
     defaultParams = {
         boardId: null,
         boardName: '',
@@ -31,6 +39,7 @@ export class BoardsComponent {
     @ViewChild('isAddBoardModal') isAddBoardModal!: ModalComponent;
     @ViewChild('isDeleteBoardModal') isDeleteBoardModal!: ModalComponent;
     @ViewChild('isViewBoardModal') isViewBoardModal!: ModalComponent;
+    workspaceId!: number;
     params!: FormGroup;
     isShowNoteMenu = false;
     filterdBoardsList: Board[] = [];
@@ -45,18 +54,24 @@ export class BoardsComponent {
         thumb: '',
     };
     selectedBoard: any;
+    workspace!: workspace;
 
     boardList:Board[] = [];
     boardPage:BoardPage | undefined 
-
     ngOnInit() {
+        this.route.params.subscribe(params => {
+            this.workspaceId = params['workspaceId'];    
+            console.log(params);        
+          });
         this.getAllBoards();
+        this.initWorkspace();
     }
 
     getAllBoards(){
-        this.boardService.getAllBoards().subscribe((data) => {
-            this.boardPage = data;
-            this.boardList = this.boardPage.content;
+        this.boardService.getBoardByWorkspaceId(this.workspaceId).subscribe((data) => {
+            this.boardList = data;
+            console.log(data);
+            
             
             switch(this.selectedTab) {
                 case 'all':
@@ -75,6 +90,13 @@ export class BoardsComponent {
                   console.log('Unknown option');
               }
             console.log(`${this.boardList} fetched succesfully`);
+        });
+
+    }
+
+    initWorkspace(){ 
+        this.workspaceService.getWorkspaceById(this.workspaceId).subscribe((data) =>{
+            this.workspace = data;
         });
     }
 
@@ -128,7 +150,7 @@ export class BoardsComponent {
               };
             this.boardService.newBoard(
                 1,
-                2,
+                this.workspaceId,
                 newBoard
                 )
             .subscribe(
@@ -197,6 +219,8 @@ export class BoardsComponent {
             } else {
                 this.isViewBoardModal.open();  
             }
+            
+
   
         });
     }
