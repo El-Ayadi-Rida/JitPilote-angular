@@ -45,6 +45,7 @@ export class BoardDetailsComponent implements OnInit{
     sectionList!: Section[];
     workspaceId!:number;
     currentSectionId!:number;
+    ticketToDelete!:Ticket;
     params = {
         sectionId: null,
         sectionTitle: '',
@@ -220,7 +221,7 @@ export class BoardDetailsComponent implements OnInit{
     }
 
     // task
-    addEditTask(ticket: any = null , sectionId: number) {
+    addEditTicket(ticket: any = null , sectionId: number) {
         this.paramsTicket = {
             ticketId: null,
             title: '',
@@ -235,7 +236,7 @@ export class BoardDetailsComponent implements OnInit{
         this.isAddTaskModal.open();
     }
 
-    saveTask() {
+    saveTicket() {
         if (!this.paramsTicket.title) {
             this.showMessage('Title is required.', 'error');
             return;
@@ -289,19 +290,25 @@ export class BoardDetailsComponent implements OnInit{
         this.isAddTaskModal.close();
     }
 
-    deleteConfirmModal(projectId: any, task: any = null) {
-        this.selectedTask = task;
+    deleteConfirmModal(ticket: any = null) {
         setTimeout(() => {
+            this.ticketToDelete = ticket;
             this.isDeleteModal.open();
         }, 10);
     }
 
-    deleteTask() {
-        let project = this.projectList.find((d: any) => d.tasks.find((t: any) => t.id === this.selectedTask.id));
-        project.tasks = project.tasks.filter((d: any) => d.id != this.selectedTask.id);
+    deleteTicket() {
+        this.ticketService.deleteTicket(this.ticketToDelete.ticketId).subscribe({
+            next: () => {
+                this.getBoardById();
+                this.showMessage('Ticket has been deleted successfully.');
+                this.isDeleteModal.close();
+            },
+            error: (err) => {
+                console.error('Error deleting Ticket:', err);
+            },
+        });
 
-        this.showMessage('Task has been deleted successfully.');
-        this.isDeleteModal.close();
     }
 
     showMessage(msg = '', type = 'success') {

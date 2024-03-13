@@ -24,7 +24,7 @@
                             <h4 class="text-base font-semibold">{{ section.sectionTitle }}</h4>
 
                             <div class="flex items-center">
-                                <button type="button" class="hover:text-primary ltr:mr-2 rtl:ml-2" (click)="addEditTask(null,section.sectionId)">
+                                <button type="button" class="hover:text-primary ltr:mr-2 rtl:ml-2" (click)="addEditTicket(null,section.sectionId)">
                                     <icon-plus-circle />
                                 </button>
                                 <div hlMenu class="dropdown">
@@ -79,10 +79,10 @@
                                             <span>{{ ticket.status }}</span>
                                         </div>
                                         <div class="flex items-center">
-                                            <button type="button" class="hover:text-info" (click)="addEditTask(ticket,section.sectionId)">
+                                            <button type="button" class="hover:text-info" (click)="addEditTicket(ticket,section.sectionId)">
                                                 <icon-edit class="ltr:mr-3 rtl:ml-3" />
                                             </button>
-                                            <button type="button" class="hover:text-danger" (click)="deleteConfirmModal(section.sectionId, ticket)">
+                                            <button type="button" class="hover:text-danger" (click)="deleteConfirmModal(ticket)">
                                                 <icon-trash-lines />
                                             </button>
                                         </div>
@@ -92,7 +92,7 @@
                         </div>
 
                         <div class="pt-3">
-                            <button type="button" class="btn btn-primary mx-auto" (click)="addEditTask(null , section.sectionId)">
+                            <button type="button" class="btn btn-primary mx-auto" (click)="addEditTicket(null , section.sectionId)">
                                 <icon-plus />
                                 Add Ticket
                             </button>
@@ -131,7 +131,7 @@
             <div class="!font-medium">{{ paramsTicket.ticketId ? 'Edit Task' : 'Add Task' }}</div>
         </ng-template>
         <ng-template #modalBody>
-            <form (ngSubmit)="saveTask()" class="text-sm">
+            <form (ngSubmit)="saveTicket()" class="text-sm">
                 <div class="grid gap-5">
                     <div>
                         <label for="taskTitle">Name</label>
@@ -165,18 +165,18 @@
     <!-- delete task modal -->
     <modal #isDeleteModal class="no-footer">
         <ng-template #modalHeader>
-            <div class="!font-medium">Delete Task</div>
+            <div class="!font-medium">Delete Ticket</div>
         </ng-template>
         <ng-template #modalBody>
             <div class="text-center">
                 <div class="mx-auto w-fit rounded-full bg-danger p-4 text-white ring-4 ring-danger/30">
                     <icon-trash-lines />
                 </div>
-                <div class="mx-auto mt-5 text-base sm:w-3/4">Are you sure you want to delete Task?</div>
+                <div class="mx-auto mt-5 text-base sm:w-3/4">Are you sure you want to delete Ticket?</div>
 
                 <div class="mt-8 flex items-center justify-center">
                     <button type="button" class="btn btn-outline-danger" (click)="isDeleteModal.close()">Cancel</button>
-                    <button type="button" class="btn btn-primary ltr:ml-4 rtl:mr-4" (click)="deleteTask()">Delete</button>
+                    <button type="button" class="btn btn-primary ltr:ml-4 rtl:mr-4" (click)="deleteTicket()">Delete</button>
                 </div>
             </div>
         </ng-template>
