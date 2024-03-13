@@ -60,8 +60,7 @@ export class BoardsComponent {
     boardPage:BoardPage | undefined 
     ngOnInit() {
         this.route.params.subscribe(params => {
-            this.workspaceId = params['workspaceId'];    
-            console.log(params);        
+            this.workspaceId = params['workspaceId'];     
           });
         this.getAllBoards();
         this.initWorkspace();

@@ -1,7 +1,7 @@
 <div>
     <ul class="flex space-x-2 rtl:space-x-reverse">
         <li>
-            <a routerLink="/jitPilot/boards" class="text-primary hover:underline">Boards</a>
+            <a [routerLink]="['/jitPilot/board', workspaceId, 'boards']" class="text-primary hover:underline">Boards</a>
         </li>
         <li class="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
             <span>{{boardName}}</span>
@@ -10,7 +10,7 @@
     <div>
         <button type="button" class="btn btn-primary flex" (click)="addEditProject()">
             <icon-plus class="h-5 w-5 ltr:mr-3 rtl:ml-3" />
-            Add Project
+            Add Section
         </button>
     </div>
 
@@ -24,7 +24,7 @@
                             <h4 class="text-base font-semibold">{{ section.sectionTitle }}</h4>
 
                             <div class="flex items-center">
-                                <button type="button" class="hover:text-primary ltr:mr-2 rtl:ml-2" (click)="addEditTask(section.sectionId)">
+                                <button type="button" class="hover:text-primary ltr:mr-2 rtl:ml-2" (click)="addEditTask(null,section.sectionId)">
                                     <icon-plus-circle />
                                 </button>
                                 <div hlMenu class="dropdown">
@@ -35,14 +35,14 @@
                                         <li>
                                             <a href="javascript:;" *hlMenuItem="let menuItem" (click)="addEditProject(section)">Edit</a>
                                         </li>
-                                        <li><a href="javascript:;" *hlMenuItem="let menuItem" (click)="deleteProject(section)">Delete</a></li>
+                                        <li><a href="javascript:;" *hlMenuItem="let menuItem" (click)="deleteSection(section)">Delete</a></li>
                                         <li><a href="javascript:;" *hlMenuItem="let menuItem" (click)="clearProjects(section)">Clear All</a></li>
                                     </ul>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- task list -->
+                        <!-- ticket list -->
                         <div
                             [sortablejs]="section.tickets"
                             [sortablejsOptions]="{ animation: 200, group: 'default', ghostClass: 'sortable-ghost', dragClass:'sortable-drag' }"
@@ -50,9 +50,10 @@
                         >
                             <div class="sortable-list" *ngFor="let ticket of section.tickets" key="section.sectionId + '' + ticket.ticketId">
                                 <div class="mb-5 cursor-move space-y-3 rounded-md bg-[#f4f4f4] p-3 pb-5 shadow dark:bg-white-dark/20">
-                                    <ng-container *ngIf="ticket.title">
+                                    <!-- if ticket have image -->
+                                    <!-- <ng-container *ngIf="ticket.title">
                                         <img src="/assets/images/carousel1.jpeg" alt="images" class="h-32 w-full rounded-md object-cover" />
-                                    </ng-container>
+                                    </ng-container> -->
                                     <div class="text-base font-medium">{{ ticket.title }}</div>
                                     <p class="break-all">{{ ticket.description }}</p>
                                     <div class="flex flex-wrap items-center gap-2">
@@ -78,7 +79,7 @@
                                             <span>{{ ticket.status }}</span>
                                         </div>
                                         <div class="flex items-center">
-                                            <button type="button" class="hover:text-info" (click)="addEditTask(section.sectionId, ticket)">
+                                            <button type="button" class="hover:text-info" (click)="addEditTask(ticket,section.sectionId)">
                                                 <icon-edit class="ltr:mr-3 rtl:ml-3" />
                                             </button>
                                             <button type="button" class="hover:text-danger" (click)="deleteConfirmModal(section.sectionId, ticket)">
@@ -91,9 +92,9 @@
                         </div>
 
                         <div class="pt-3">
-                            <button type="button" class="btn btn-primary mx-auto" (click)="addEditTask(section.sectionId)">
+                            <button type="button" class="btn btn-primary mx-auto" (click)="addEditTask(null , section.sectionId)">
                                 <icon-plus />
-                                Add Task
+                                Add Ticket
                             </button>
                         </div>
                     </div>
@@ -105,47 +106,47 @@
     <!-- add project modal -->
     <modal #isAddProjectModal class="no-footer">
         <ng-template #modalHeader>
-            <div class="!font-medium">{{ params.id ? 'Edit Project' : 'Add Project' }}</div>
+            <div class="!font-medium">{{ params.sectionId ? 'Edit Section' : 'Add Section' }}</div>
         </ng-template>
         <ng-template #modalBody>
-            <form (ngSubmit)="saveProject()" class="text-sm">
+            <form (ngSubmit)="saveSection()" class="text-sm">
                 <div class="grid gap-5">
                     <div>
                         <label for="title">Name</label>
-                        <input id="title" [(ngModel)]="params.title" name="title" type="text" class="form-input mt-1" placeholder="Enter Name" />
+                        <input id="title" [(ngModel)]="params.sectionTitle" name="title" type="text" class="form-input mt-1" placeholder="Enter Name" />
                     </div>
                 </div>
 
                 <div class="mt-8 flex items-center justify-end">
                     <button type="button" class="btn btn-outline-danger" (click)="isAddProjectModal.close()">Cancel</button>
-                    <button type="submit" class="btn btn-primary ltr:ml-4 rtl:mr-4">{{ params.id ? 'Update' : 'Add' }}</button>
+                    <button type="submit" class="btn btn-primary ltr:ml-4 rtl:mr-4">{{ params.sectionId ? 'Update' : 'Add' }}</button>
                 </div>
             </form>
         </ng-template>
     </modal>
 
     <!-- add task modal -->
-    <!-- <modal #isAddTaskModal class="no-footer">
+    <modal #isAddTaskModal class="no-footer">
         <ng-template #modalHeader>
-            <div class="!font-medium">{{ paramsticket.id ? 'Edit Task' : 'Add Task' }}</div>
+            <div class="!font-medium">{{ paramsTicket.ticketId ? 'Edit Task' : 'Add Task' }}</div>
         </ng-template>
         <ng-template #modalBody>
             <form (ngSubmit)="saveTask()" class="text-sm">
                 <div class="grid gap-5">
                     <div>
                         <label for="taskTitle">Name</label>
-                        <input id="taskTitle" [(ngModel)]="paramsticket.title" name="title" type="text" class="form-input" placeholder="Enter Name" />
+                        <input id="taskTitle" [(ngModel)]="paramsTicket.title" name="title" type="text" class="form-input" placeholder="Enter Name" />
                     </div>
 
-                    <div>
+                    <!-- <div>
                         <label for="taskTag">Tag</label>
                         <input id="taskTag" [(ngModel)]="paramsticket.tags" name="tags" type="text" class="form-input" placeholder="Enter Tag" />
-                    </div>
+                    </div> -->
                     <div>
                         <label for="taskdesc">Description</label>
                         <textarea
                             id="taskdesc"
-                            [(ngModel)]="paramsticket.description"
+                            [(ngModel)]="paramsTicket.description"
                             name="description"
                             class="form-textarea min-h-[130px]"
                             placeholder="Enter Description"
@@ -155,11 +156,11 @@
 
                 <div class="mt-8 flex items-center justify-end">
                     <button type="button" class="btn btn-outline-danger" (click)="isAddTaskModal.close()">Cancel</button>
-                    <button type="submit" class="btn btn-primary ltr:ml-4 rtl:mr-4">{{ paramsticket.id ? 'Update' : 'Add' }}</button>
+                    <button type="submit" class="btn btn-primary ltr:ml-4 rtl:mr-4">{{ paramsTicket.ticketId ? 'Update' : 'Add' }}</button>
                 </div>
             </form>
         </ng-template>
-    </modal> -->
+    </modal>
 
     <!-- delete task modal -->
     <modal #isDeleteModal class="no-footer">

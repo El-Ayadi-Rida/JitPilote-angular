@@ -7,6 +7,11 @@ import { BoardService } from '../../services/board.service';
 import { FormBuilder } from '@angular/forms';
 import { Board } from '../../models/board';
 import { Section } from '../../models/section';
+import { SectionService } from '../../services/section.service';
+import { TicketPriority } from '../../models/ticket-priority';
+import { TicketStatus } from '../../models/ticket-status';
+import { Ticket } from '../../models/ticket';
+import { TicketService } from '../../services/ticket.service';
 
 @Component({
     moduleId: module.id,
@@ -19,27 +24,39 @@ import { Section } from '../../models/section';
     ],
 })
 export class BoardDetailsComponent implements OnInit{
-    constructor(private route: ActivatedRoute,public fb: FormBuilder , private boardService:BoardService) {}
+    constructor(
+        private route: ActivatedRoute,
+        public fb: FormBuilder , 
+        private boardService:BoardService,
+        private sectionService:SectionService,
+        private ticketService:TicketService
+        ) {}
     ngOnInit(): void {
         this.route.params.subscribe(params => {
             this.boardId = params['boardId'];            
           });
           this.getBoardById();
+          this.workspaceId=JSON.parse(sessionStorage.getItem("workspaceItem")!).workspaceId;
+          console.log(this.workspaceId);
     }
     boardId:number=0;
     currentBoard!: Board;
     boardName!:string;
     sectionList!: Section[];
+    workspaceId!:number;
+    currentSectionId!:number;
     params = {
-        id: null,
-        title: '',
+        sectionId: null,
+        sectionTitle: '',
+        tickets:[],
     };
-    paramsTask = {
-        projectId: null,
-        id: null,
+    paramsTicket = {
+        ticketId: null,
         title: '',
         description: '',
-        tags: '',
+        priority: TicketPriority.HIGH,
+        status: TicketStatus.IN_PROGRESS,
+    
     };
     selectedTask: any = null;
     @ViewChild('isAddProjectModal') isAddProjectModal!: ModalComponent;
@@ -114,57 +131,88 @@ export class BoardDetailsComponent implements OnInit{
                             response => {
                                 this.currentBoard = response;
                                 this.sectionList = this.currentBoard.sections;
-                                this.boardName =this.currentBoard.boardName;
-                                console.log(this.sectionList);
-                                
+                                this.boardName =this.currentBoard.boardName;                                
                             },
                             error => {console.error('Error geting board:', error);}
                         );
     }
-    addEditProject(project: any = null) {
+    addEditProject(section: any = null) {
         setTimeout(() => {
             this.params = {
-                id: null,
-                title: '',
+                sectionId: null,
+                sectionTitle: '',
+                tickets:[],
             };
-            if (project) {
-                this.params = JSON.parse(JSON.stringify(project));
+            if (section) {
+                this.params = JSON.parse(JSON.stringify(section));
             }
             this.isAddProjectModal.open();
         });
     }
 
-    saveProject() {
-        if (!this.params.title) {
+    saveSection() {
+        if (!this.params.sectionTitle) {
             this.showMessage('Title is required.', 'error');
             return;
         }
 
-        if (this.params.id) {
-            //update project
-            const project = this.projectList.find((d: any) => d.id === this.params.id);
-            project.title = this.params.title;
-        } else {
-            //add project
-            const lastId = this.projectList.length
-                ? this.projectList.reduce((max: number, obj: any) => (obj.id > max ? obj.id : max), this.projectList[0].id)
-                : 0;
-
-            const project = {
-                id: lastId + 1,
-                title: this.params.title,
-                tasks: [],
+        if (this.params.sectionId) {
+            //update section
+            const sectionToUpdate: Section = {
+                sectionId: this.params.sectionId,
+                sectionTitle: this.params.sectionTitle,
+                description: this.params.sectionTitle,
+                tickets: this.params.tickets
             };
-            this.projectList.push(project);
+            this.sectionService.updateSection(
+                this.params.sectionId,
+                sectionToUpdate
+                )
+            .subscribe(
+                response => {
+                    console.log('section updated successfully:', response);
+                    this.getBoardById();
+                },
+                error => {console.error('Error updating section:', error);}
+                
+            );
+        } else {
+            //add section
+            const newSection:any ={
+                sectionId:null,
+                sectionTitle: this.params.sectionTitle,
+                description: this.params.sectionTitle,
+                tickets:[]
+            }
+            this.sectionService.newSection(
+                this.boardId,
+                newSection
+            )
+            .subscribe(
+                response => {
+                    console.log('section added successfully:', response);
+                    this.getBoardById();
+                },
+                error => {console.error('Error adding section:', error);}
+                
+            );
         }
 
-        this.showMessage('Project has been saved successfully.');
+        this.showMessage('section has been saved successfully.');
         this.isAddProjectModal.close();
     }
 
-    deleteProject(project: any) {
-        this.projectList = this.projectList.filter((d: any) => d.id != project.id);
-        this.showMessage('Project has been deleted successfully.');
+    deleteSection(section: Section) {
+        this.sectionService.deleteSection(section.sectionId).subscribe({
+            next: () => {
+                console.log('Section after next');
+                this.getBoardById();
+                this.showMessage('Section has been deleted successfully.');
+            },
+            error: (err) => {
+                console.error('Error deleting Section:', err);
+            },
+        });
     }
 
     clearProjects(project: any) {
@@ -172,61 +220,72 @@ export class BoardDetailsComponent implements OnInit{
     }
 
     // task
-    addEditTask(projectId: any, task: any = null) {
-        this.paramsTask = {
-            projectId: null,
-            id: null,
+    addEditTask(ticket: any = null , sectionId: number) {
+        this.paramsTicket = {
+            ticketId: null,
             title: '',
             description: '',
-            tags: '',
+            priority: TicketPriority.HIGH,
+            status: TicketStatus.IN_PROGRESS,
         };
-        if (task) {
-            this.paramsTask = JSON.parse(JSON.stringify(task));
-            this.paramsTask.tags = this.paramsTask.tags ? this.paramsTask.tags.toString() : '';
+        if (ticket) {
+            this.paramsTicket = JSON.parse(JSON.stringify(ticket));
         }
-        this.paramsTask.projectId = projectId;
+        this.currentSectionId = sectionId;
         this.isAddTaskModal.open();
     }
 
     saveTask() {
-        if (!this.paramsTask.title) {
+        if (!this.paramsTicket.title) {
             this.showMessage('Title is required.', 'error');
             return;
         }
 
-        const project = this.projectList.find((d: any) => d.id === this.paramsTask.projectId);
-        if (this.paramsTask.id) {
+        if (this.paramsTicket.ticketId) {
             //update task
-            const task = project.tasks.find((d: any) => d.id === this.paramsTask.id);
-            task.title = this.paramsTask.title;
-            task.description = this.paramsTask.description;
-            task.tags = this.paramsTask.tags?.length > 0 ? this.paramsTask.tags.split(',') : [];
+            const ticketToUpdate: any = {
+                ticketId: this.paramsTicket.ticketId,
+                title: this.paramsTicket.title,
+                description: this.paramsTicket.description,
+                priority: this.paramsTicket.priority,
+                status: this.paramsTicket.status,
+            };
+            this.ticketService.updateTicket(
+                this.paramsTicket.ticketId,
+                ticketToUpdate
+                )
+            .subscribe(
+                response => {
+                    console.log('ticket updated successfully:', response);
+                    this.getBoardById();
+                },
+                error => {console.error('Error updating ticket:', error);}
+                
+            );
         } else {
             //add task
-            let maxid = 0;
-            if (project.tasks?.length) {
-                maxid = project.tasks.reduce((max: number, obj: any) => (obj.id > max ? obj.id : max), project.tasks[0].id);
+            const newTicket:any ={
+                ticketId: null,
+                title: this.paramsTicket.title,
+                description: this.paramsTicket.description,
+                priority: this.paramsTicket.priority,
+                status: this.paramsTicket.status,
             }
-
-            const today = new Date();
-            const dd = String(today.getDate()).padStart(2, '0');
-            const mm = String(today.getMonth()); //January is 0!
-            const yyyy = today.getFullYear();
-            const monthNames: any = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
-            const task = {
-                projectId: this.paramsTask.projectId,
-                id: maxid + 0.1,
-                title: this.paramsTask.title,
-                description: this.paramsTask.description,
-                date: dd + ' ' + monthNames[mm] + ', ' + yyyy,
-                tags: this.paramsTask.tags?.length > 0 ? this.paramsTask.tags.split(',') : [],
-            };
-
-            project.tasks.push(task);
+            this.ticketService.newTicket(
+                this.currentSectionId,
+                newTicket
+            )
+            .subscribe(
+                response => {
+                    console.log('Ticket added successfully:', response);
+                    this.getBoardById();
+                },
+                error => {console.error('Error adding Ticket:', error);}
+                
+            );
         }
 
-        this.showMessage('Task has been saved successfully.');
+        this.showMessage('ticket has been saved successfully.');
         this.isAddTaskModal.close();
     }
 
