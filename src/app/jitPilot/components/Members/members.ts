@@ -53,11 +53,14 @@ export class MembersComponent {
 
     displayType = 'grid';
     @ViewChild('addContactModal') addContactModal!: ModalComponent;
+    @ViewChild('isDeleteMemeberModal') isDeleteMemeberModal!: ModalComponent;
     params!: FormGroup;
     filteredMembersList: UserResponse[] = [];
     memberList: UserResponse[] = [];
     searchUser = '';
     workspaceId!: number;
+    deletedMember: any = null;
+
 
 
 
@@ -75,7 +78,7 @@ export class MembersComponent {
     ngOnInit() {
         this.route.params.subscribe(params => {
             this.workspaceId = params['workspaceId'];    
-            console.log("hhhhhh",this.workspaceId);        
+            console.log(this.workspaceId);        
           });
         this.searchContacts();
         this.getUsers();
@@ -89,15 +92,40 @@ export class MembersComponent {
         });
     }
 
-    removeUser(id: number) {
-        console.log("remove user ")
-        this.userService.removeUser(id).subscribe({
+    // removeUser(id: number) {
+    //     console.log("remove user ")
+    //     this.userService.removeUser(id, this.workspaceId).subscribe({
+    //         next: () => {
+    //             console.log('remove user after next');
+    //             this.filteredMembersList = this.filteredMembersList.filter((member) => member.userId !== id);
+    //             this.memberList = this.memberList.filter((member) => member.userId !== id);
+    //             this.showMessage('User has been deleted successfully.');
+    //             console.log('member deleted successfully');
+    //         },
+    //         error: (err) => {
+    //             console.error('Error deleting member:', err);
+    //         },
+    //     });
+    // }
+
+
+    deleteMemberConfirm(member: any) {
+        setTimeout(() => {
+            this.deletedMember = member;
+            this.isDeleteMemeberModal.open();
+        },10);
+    }
+
+    deleteMember() {
+        this.userService.removeUser(this.deletedMember.userId, this.workspaceId).subscribe({
             next: () => {
-                console.log('remove user after next');
-                this.filteredMembersList = this.filteredMembersList.filter((member) => member.userId !== id);
-                this.memberList = this.memberList.filter((member) => member.userId !== id);
-                this.showMessage('User has been deleted successfully.');
-                console.log('member deleted successfully');
+                console.log('member after next');
+                this.filteredMembersList = this.filteredMembersList.filter((member) => member.userId !== this.deletedMember.userId);
+                this.memberList = this.memberList.filter((member) => member.userId !== this.deletedMember.userId);
+               this.getUsers(); 
+               this.showMessage('member has been deleted successfully.');
+               console.log('member deleted successfully:');
+               this.isDeleteMemeberModal.close();
             },
             error: (err) => {
                 console.error('Error deleting member:', err);

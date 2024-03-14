@@ -47,6 +47,7 @@ export class BoardDetailsComponent implements OnInit {
     workspaceId!: number;
     currentSectionId!: number;
     ticketToDelete!: Ticket;
+    sectionToClear!:Section;
     params = {
         sectionId: null,
         sectionTitle: '',
@@ -63,7 +64,6 @@ export class BoardDetailsComponent implements OnInit {
     @ViewChild('isAddProjectModal') isAddProjectModal!: ModalComponent;
     @ViewChild('isAddTaskModal') isAddTaskModal!: ModalComponent;
     @ViewChild('isDeleteModal') isDeleteModal!: ModalComponent;
-    @ViewChild('isDeleteSectionModal') isDeleteSelectionModal!: ModalComponent;
     projectList: any = [
         {
             id: 1,
@@ -296,6 +296,13 @@ export class BoardDetailsComponent implements OnInit {
         }, 10);
     }
 
+    clearConfirmModal(section: any = null) {
+        setTimeout(() => {
+            this.sectionToClear = section;
+            this.isClearAlllModal.open();
+        }, 10);
+    }
+
     deleteTicket() {
         this.ticketService.deleteTicket(this.ticketToDelete.ticketId).subscribe({
             next: () => {
@@ -307,6 +314,7 @@ export class BoardDetailsComponent implements OnInit {
                 console.error('Error deleting Ticket:', err);
             },
         });
+
     }
 
     showMessage(msg = '', type = 'success') {

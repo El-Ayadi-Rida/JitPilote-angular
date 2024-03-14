@@ -22,4 +22,7 @@ export class TicketService {
   deleteTicket(ticketId: number):Observable<Ticket>{
     return this.http.delete<Ticket>(`${environment.URL_API}/tickets/${ticketId}`);
   }
-}
+
+  deleteAllTicket(sectionId: number): Observable<Ticket>{
+    return this.http.delete<Ticket>(`${environment.URL_API}/tickets/deleteAll/${sectionId}`);
+}}
