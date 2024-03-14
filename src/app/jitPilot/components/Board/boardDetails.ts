@@ -12,6 +12,8 @@ import { TicketPriority } from '../../models/ticket-priority';
 import { TicketStatus } from '../../models/ticket-status';
 import { Ticket } from '../../models/ticket';
 import { TicketService } from '../../services/ticket.service';
+import { CdkDragDrop } from '@angular/cdk/drag-drop';
+
 
 @Component({
     moduleId: module.id,
@@ -345,4 +347,31 @@ export class BoardDetailsComponent implements OnInit {
             padding: '10px 20px',
         });
     }
+
+    
+    currentTicketToDrag!:any;
+    
+    onDragStart(ticketId: number){
+        this.currentTicketToDrag=ticketId;
+    }
+
+    onDrop(event: any,sectionId:number){
+        event.preventDefault();
+        this.ticketService.updateTickectSection(this.currentTicketToDrag, sectionId)
+          .subscribe({
+            next: () => {
+                this.getBoardById();
+                this.showMessage('Ticket updated successfully.');
+            },
+            error: (err) => {
+                console.error('Error draging Ticket:', err);
+            },
+        });
+        this.currentTicketToDrag=null;
+    }
+
+    onDragOver(event: any){
+        event.preventDefault();
+    }
+
 }

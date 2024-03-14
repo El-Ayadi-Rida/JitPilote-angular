@@ -18,8 +18,11 @@
     <div class="relative pt-5">
         <div class="-mx-2 h-full">
             <div class="flex flex-nowrap items-start gap-5 overflow-x-auto px-2 pb-2">
-                <ng-container *ngFor="let section of sectionList" key="section.id">
-                    <div class="panel w-80 flex-none">
+                <ng-container *ngFor="let section of sectionList" key="section.id"
+                >
+                    <div class="panel w-80 flex-none" 
+                    (dragover)="onDragOver($event)" 
+                    (drop)="onDrop($event,section.sectionId)">
                         <div class="mb-5 flex justify-between">
                             <h4 class="text-base font-semibold">{{ section.sectionTitle }}</h4>
 
@@ -47,7 +50,11 @@
                             [sortablejsOptions]="{ animation: 200, group: 'default', ghostClass: 'sortable-ghost', dragClass:'sortable-drag' }"
                             class="connect-sorting-content min-h-[150px]"
                         >
-                            <div class="sortable-list" *ngFor="let ticket of section.tickets" key="section.sectionId + '' + ticket.ticketId">
+                            <div class="sortable-list" *ngFor="let ticket of section.tickets" 
+                            key="section.sectionId + '' + ticket.ticketId"
+                            draggable="true"  (dragstart)="onDragStart(ticket.ticketId)"
+
+                            >
                                 <div class="mb-5 cursor-move space-y-3 rounded-md bg-[#f4f4f4] p-3 pb-5 shadow dark:bg-white-dark/20">
                                     <!-- if ticket have image -->
                                     <!-- <ng-container *ngIf="ticket.title">
