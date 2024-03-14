@@ -23,33 +23,34 @@ import { TicketService } from '../../services/ticket.service';
         ]),
     ],
 })
-export class BoardDetailsComponent implements OnInit{
+export class BoardDetailsComponent implements OnInit {
     constructor(
         private route: ActivatedRoute,
-        public fb: FormBuilder , 
-        private boardService:BoardService,
-        private sectionService:SectionService,
-        private ticketService:TicketService
-        ) {}
+        public fb: FormBuilder,
+        private boardService: BoardService,
+        private sectionService: SectionService,
+        private ticketService: TicketService
+    ) {}
     ngOnInit(): void {
-        this.route.params.subscribe(params => {
-            this.boardId = params['boardId'];            
-          });
-          this.getBoardById();
-          this.workspaceId=JSON.parse(sessionStorage.getItem("workspaceItem")!).workspaceId;
-          console.log(this.workspaceId);
+        this.route.params.subscribe((params) => {
+            this.boardId = params['boardId'];
+        });
+        this.getBoardById();
+        this.workspaceId = JSON.parse(sessionStorage.getItem('workspaceItem')!).workspaceId;
+        console.log(this.workspaceId);
     }
-    boardId:number=0;
+    boardId: number = 0;
     currentBoard!: Board;
-    boardName!:string;
+    boardName!: string;
     sectionList!: Section[];
-    workspaceId!:number;
-    currentSectionId!:number;
-    ticketToDelete!:Ticket;
+    deletedSection!: Section;
+    workspaceId!: number;
+    currentSectionId!: number;
+    ticketToDelete!: Ticket;
     params = {
         sectionId: null,
         sectionTitle: '',
-        tickets:[],
+        tickets: [],
     };
     paramsTicket = {
         ticketId: null,
@@ -57,12 +58,12 @@ export class BoardDetailsComponent implements OnInit{
         description: '',
         priority: TicketPriority.HIGH,
         status: TicketStatus.IN_PROGRESS,
-    
     };
     selectedTask: any = null;
     @ViewChild('isAddProjectModal') isAddProjectModal!: ModalComponent;
     @ViewChild('isAddTaskModal') isAddTaskModal!: ModalComponent;
     @ViewChild('isDeleteModal') isDeleteModal!: ModalComponent;
+    @ViewChild('isDeleteSectionModal') isDeleteSelectionModal!: ModalComponent;
     projectList: any = [
         {
             id: 1,
@@ -126,23 +127,24 @@ export class BoardDetailsComponent implements OnInit{
             tasks: [],
         },
     ];
-    getBoardById(){
-        this.boardService.getBoardById(this.boardId)
-                        .subscribe(
-                            response => {
-                                this.currentBoard = response;
-                                this.sectionList = this.currentBoard.sections;
-                                this.boardName =this.currentBoard.boardName;                                
-                            },
-                            error => {console.error('Error geting board:', error);}
-                        );
+    getBoardById() {
+        this.boardService.getBoardById(this.boardId).subscribe(
+            (response) => {
+                this.currentBoard = response;
+                this.sectionList = this.currentBoard.sections;
+                this.boardName = this.currentBoard.boardName;
+            },
+            (error) => {
+                console.error('Error geting board:', error);
+            }
+        );
     }
     addEditProject(section: any = null) {
         setTimeout(() => {
             this.params = {
                 sectionId: null,
                 sectionTitle: '',
-                tickets:[],
+                tickets: [],
             };
             if (section) {
                 this.params = JSON.parse(JSON.stringify(section));
@@ -163,39 +165,33 @@ export class BoardDetailsComponent implements OnInit{
                 sectionId: this.params.sectionId,
                 sectionTitle: this.params.sectionTitle,
                 description: this.params.sectionTitle,
-                tickets: this.params.tickets
+                tickets: this.params.tickets,
             };
-            this.sectionService.updateSection(
-                this.params.sectionId,
-                sectionToUpdate
-                )
-            .subscribe(
-                response => {
+            this.sectionService.updateSection(this.params.sectionId, sectionToUpdate).subscribe(
+                (response) => {
                     console.log('section updated successfully:', response);
                     this.getBoardById();
                 },
-                error => {console.error('Error updating section:', error);}
-                
+                (error) => {
+                    console.error('Error updating section:', error);
+                }
             );
         } else {
             //add section
-            const newSection:any ={
-                sectionId:null,
+            const newSection: any = {
+                sectionId: null,
                 sectionTitle: this.params.sectionTitle,
                 description: this.params.sectionTitle,
-                tickets:[]
-            }
-            this.sectionService.newSection(
-                this.boardId,
-                newSection
-            )
-            .subscribe(
-                response => {
+                tickets: [],
+            };
+            this.sectionService.newSection(this.boardId, newSection).subscribe(
+                (response) => {
                     console.log('section added successfully:', response);
                     this.getBoardById();
                 },
-                error => {console.error('Error adding section:', error);}
-                
+                (error) => {
+                    console.error('Error adding section:', error);
+                }
             );
         }
 
@@ -203,12 +199,21 @@ export class BoardDetailsComponent implements OnInit{
         this.isAddProjectModal.close();
     }
 
-    deleteSection(section: Section) {
-        this.sectionService.deleteSection(section.sectionId).subscribe({
+    deleteSectionConfirm(section: Section) {
+        setTimeout(() => {
+            this.deletedSection = section;
+            this.isDeleteSelectionModal.open();
+        });
+    }
+
+    deleteSection() {
+        this.sectionService.deleteSection(this.deletedSection.sectionId).subscribe({
             next: () => {
                 console.log('Section after next');
+                //this.sectionList = this.sectionList.filter((s)=>{s.sectionId !== this.deletedSection.sectionId;})
                 this.getBoardById();
                 this.showMessage('Section has been deleted successfully.');
+                this.isDeleteSelectionModal.close();
             },
             error: (err) => {
                 console.error('Error deleting Section:', err);
@@ -221,7 +226,7 @@ export class BoardDetailsComponent implements OnInit{
     }
 
     // task
-    addEditTicket(ticket: any = null , sectionId: number) {
+    addEditTicket(ticket: any = null, sectionId: number) {
         this.paramsTicket = {
             ticketId: null,
             title: '',
@@ -251,38 +256,32 @@ export class BoardDetailsComponent implements OnInit{
                 priority: this.paramsTicket.priority,
                 status: this.paramsTicket.status,
             };
-            this.ticketService.updateTicket(
-                this.paramsTicket.ticketId,
-                ticketToUpdate
-                )
-            .subscribe(
-                response => {
+            this.ticketService.updateTicket(this.paramsTicket.ticketId, ticketToUpdate).subscribe(
+                (response) => {
                     console.log('ticket updated successfully:', response);
                     this.getBoardById();
                 },
-                error => {console.error('Error updating ticket:', error);}
-                
+                (error) => {
+                    console.error('Error updating ticket:', error);
+                }
             );
         } else {
             //add task
-            const newTicket:any ={
+            const newTicket: any = {
                 ticketId: null,
                 title: this.paramsTicket.title,
                 description: this.paramsTicket.description,
                 priority: this.paramsTicket.priority,
                 status: this.paramsTicket.status,
-            }
-            this.ticketService.newTicket(
-                this.currentSectionId,
-                newTicket
-            )
-            .subscribe(
-                response => {
+            };
+            this.ticketService.newTicket(this.currentSectionId, newTicket).subscribe(
+                (response) => {
                     console.log('Ticket added successfully:', response);
                     this.getBoardById();
                 },
-                error => {console.error('Error adding Ticket:', error);}
-                
+                (error) => {
+                    console.error('Error adding Ticket:', error);
+                }
             );
         }
 
@@ -308,7 +307,6 @@ export class BoardDetailsComponent implements OnInit{
                 console.error('Error deleting Ticket:', err);
             },
         });
-
     }
 
     showMessage(msg = '', type = 'success') {

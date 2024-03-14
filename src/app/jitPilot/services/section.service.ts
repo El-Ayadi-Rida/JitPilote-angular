@@ -19,7 +19,7 @@ export class SectionService {
     return this.http.put<Section>(`${environment.URL_API}/section/${sectionId}`,section);
   }
 
-  deleteSection(sectionId: number):Observable<Section>{
-    return this.http.delete<Section>(`${environment.URL_API}/section/${sectionId}`);
+  deleteSection(sectionId: number):Observable<string>{
+    return this.http.delete<string>(`${environment.URL_API}/section/${sectionId}`);
   }
 }
