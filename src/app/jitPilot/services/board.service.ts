@@ -18,7 +18,7 @@ getWorkspaceBoards():Observable<BoardPage>{
   return this.http.get<BoardPage>(`${environment.URL_API}/boards`);
 }
 newBoard(userId: number,workspaceId: number,board:Board):Observable<Board>{
-    return this.http.post<Board>(`${environment.URL_API}/boards/${userId}/${workspaceId}/board`,board);
+    return this.http.post<Board>(`${environment.URL_API}/boards/create/${userId}/${workspaceId}/template`,board);
 }
 updateBoard(boardId: number,board:Board):Observable<Board>{
   return this.http.put<Board>(`${environment.URL_API}/boards/${boardId}`,board);

@@ -10,6 +10,7 @@ import { AccessLevel } from '../../models/access-level';
 import { ActivatedRoute, Router } from '@angular/router';
 import { WorkspaceService } from '../../services/workspace.service';
 import { workspace } from '../../models/workspace';
+import { TemplateType } from '../../models/template-type';
 
 @Component({
     moduleId: module.id,
@@ -35,6 +36,7 @@ export class BoardsComponent {
         description: '',
         fav: false,
         accessLevel: AccessLevel.PRIVATE,
+        templateType:TemplateType.SCRUM
     };
     @ViewChild('isAddBoardModal') isAddBoardModal!: ModalComponent;
     @ViewChild('isDeleteBoardModal') isDeleteBoardModal!: ModalComponent;
@@ -45,14 +47,7 @@ export class BoardsComponent {
     filterdBoardsList: Board[] = [];
     selectedTab: any = 'all';
     deletedBoard: any = null;
-    selectedNote: any = {
-        id: null,
-        title: '',
-        description: '',
-        tag: '',
-        user: '',
-        thumb: '',
-    };
+
     selectedBoard: any;
     workspace!: workspace;
 
@@ -107,6 +102,7 @@ export class BoardsComponent {
             description: [''],
             fav: [false],
             accessLevel: [AccessLevel.PRIVATE],
+            templateType: [TemplateType.KANBAN , Validators.required],
         });
 
     }
@@ -125,6 +121,7 @@ export class BoardsComponent {
                 description: this.params.value.description,
                 fav: this.params.value.fav,
                 accessLevel: this.params.value.accessLevel,
+                templateType:this.params.value.templateType,
             }
             this.boardService.updateBoard(
                 this.params.value.boardId,
@@ -146,6 +143,7 @@ export class BoardsComponent {
                 boardName: this.params.value.boardName,
                 description: this.params.value.description,
                 accessLevel: this.params.value.accessLevel,
+                templateType:this.params.value.templateType,
               };
             this.boardService.newBoard(
                 1,
@@ -275,6 +273,16 @@ export class BoardsComponent {
             return AccessLevel.PRIVATE;
           case 'PUBLIC':
             return AccessLevel.PUBLIC;
+          default:
+            throw new Error(`Invalid access level: ${value}`);
+        }
+      }
+      stringToTemplateType(value: string): TemplateType {
+        switch (value.toUpperCase()) {
+          case 'SCRUM':
+            return TemplateType.SCRUM;
+          case 'KANBAN':
+            return TemplateType.KANBAN;
           default:
             throw new Error(`Invalid access level: ${value}`);
         }

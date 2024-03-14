@@ -99,13 +99,14 @@
                     <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
                         <ng-container *ngFor="let board of filterdBoardsList">
                             <div
-                                class="panel pb-12"
+                                class="panel pb-12 cursor-pointer"
                                 [ngClass]="{
                                         'bg-info-light shadow-info': board.accessLevel === 'PUBLIC',
                                         'bg-danger-light shadow-danger': board.accessLevel === 'PRIVATE',
                                         'dark:shadow-dark': !board.accessLevel}"
+                                
                             >
-                                <div class="min-h-[142px]">
+                                <div class="min-h-[142px]" (click)="viewBoard(board)">
                                     <div class="flex justify-between">
                                         <div class="flex w-max items-center">
                                             <div class="flex-none">
@@ -215,33 +216,16 @@
                             <label for="boardName">Board Title</label>
                             <input id="boardName" type="text" placeholder="Enter board Name" class="form-input" formControlName="boardName" />
                         </div>
-                        <!-- <div class="mb-5">
-                            <label for="name">User Name</label>
-                            <select id="name" class="form-select" formControlName="user">
-                                <option value="">Select User</option>
-                                <option value="Max Smith">Max Smith</option>
-                                <option value="John Doe">John Doe</option>
-                                <option value="Kia Jain">Kia Jain</option>
-                                <option value="Karena Courtliff">Karena Courtliff</option>
-                                <option value="Vladamir Koschek">Vladamir Koschek</option>
-                                <option value="Robert Garcia">Robert Garcia</option>
-                                <option value="Marie Hamilton">Marie Hamilton</option>
-                                <option value="Megan Meyers">Megan Meyers</option>
-                                <option value="Angela Hull">Angela Hull</option>
-                                <option value="Karen Wolf">Karen Wolf</option>
-                                <option value="Jasmine Barnes">Jasmine Barnes</option>
-                                <option value="Thomas Cox">Thomas Cox</option>
-                                <option value="Marcus Jones">Marcus Jones</option>
-                                <option value="Matthew Gray">Matthew Gray</option>
-                                <option value="Chad Davis">Chad Davis</option>
-                                <option value="Linda Drake">Linda Drake</option>
-                                <option value="Kathleen Flores">Kathleen Flores</option>
+                        <div class="mb-5">
+                            <label for="name">Board Template</label>
+                            <select id="name" class="form-select" formControlName="templateType">
+                                <option value="SCRUM" [defaultSelected]="">SCRUM</option>
+                                <option value="KANBAN">KANBAN</option>
                             </select>
-                        </div> -->
+                        </div>
                         <div class="mb-5">
                             <label for="accessLevel">Access Level</label>
                             <select id="accessLevel" class="form-select" formControlName="accessLevel">
-                                <option value="">None</option>
                                 <option value="PUBLIC">Public</option>
                                 <option value="PRIVATE">Private</option>
                             </select>
@@ -297,7 +281,7 @@
                         >
                             {{ selectedBoard.accessLevel }}
                         </button>
-                        <button *ngIf="selectedNote.isFav" type="button" class="text-warning">
+                        <button *ngIf="selectedBoard.fav" type="button" class="text-warning">
                             <icon-star class="fill-warning" />
                         </button>
                     </div>
