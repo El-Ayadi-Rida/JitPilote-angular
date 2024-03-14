@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Routes, RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 
 // modal
 
@@ -57,6 +58,7 @@ const routes: Routes = [
         ReactiveFormsModule,
         ModalModule,
         SortablejsModule,
+        DragDropModule,
         MenuModule,
         NgScrollbarModule.withConfig({
             visibility: 'hover',

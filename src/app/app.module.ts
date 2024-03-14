@@ -5,6 +5,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
+import { DragDropModule } from '@angular/cdk/drag-drop';
+
 
 //Routes
 import { routes } from './app.route';
@@ -71,6 +73,8 @@ import { AuthLayout } from './layouts/auth-layout';
         FormsModule,
         ReactiveFormsModule,
         HttpClientModule,
+
+        DragDropModule,
         TranslateModule.forRoot({
             loader: {
                 provide: TranslateLoader,
