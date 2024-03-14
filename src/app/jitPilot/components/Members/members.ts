@@ -1,65 +1,54 @@
-import {
-    Component,
-    ViewChild
-} from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import Swal from 'sweetalert2';
-import {
-    animate,
-    style,
-    transition,
-    trigger
-} from '@angular/animations';
-import {
-    ModalComponent
-} from 'angular-custom-modal';
-import {
-    FormBuilder,
-    FormGroup,
-    Validators
-} from '@angular/forms';
-import {
-    UserResponse
-} from '../../models/user-response';
-import {
-    UserService
-} from '../../services/user.service';
+import { animate, style, transition, trigger } from '@angular/animations';
+import { ModalComponent } from 'angular-custom-modal';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { UserResponse } from '../../models/user-response';
+import { UserService } from '../../services/user.service';
 import { ActivatedRoute, Router } from '@angular/router';
-
 
 @Component({
     moduleId: module.id,
     templateUrl: './members.html',
     animations: [
         trigger('toggleAnimation', [
-            transition(':enter', [style({
-                opacity: 0,
-                transform: 'scale(0.95)'
-            }), animate('100ms ease-out', style({
-                opacity: 1,
-                transform: 'scale(1)'
-            }))]),
-            transition(':leave', [animate('75ms', style({
-                opacity: 0,
-                transform: 'scale(0.95)'
-            }))]),
+            transition(':enter', [
+                style({
+                    opacity: 0,
+                    transform: 'scale(0.95)',
+                }),
+                animate(
+                    '100ms ease-out',
+                    style({
+                        opacity: 1,
+                        transform: 'scale(1)',
+                    })
+                ),
+            ]),
+            transition(':leave', [
+                animate(
+                    '75ms',
+                    style({
+                        opacity: 0,
+                        transform: 'scale(0.95)',
+                    })
+                ),
+            ]),
         ]),
     ],
 })
 export class MembersComponent {
-    constructor(public fb: FormBuilder, 
-        private userService: UserService,
-        private router: Router,
-        private route: ActivatedRoute,) {}
+    constructor(public fb: FormBuilder, private userService: UserService, private router: Router, private route: ActivatedRoute) {}
 
     displayType = 'grid';
     @ViewChild('addContactModal') addContactModal!: ModalComponent;
+    @ViewChild('isDeleteMemeberModal') isDeleteMemeberModal!: ModalComponent;
     params!: FormGroup;
     filteredMembersList: UserResponse[] = [];
     memberList: UserResponse[] = [];
     searchUser = '';
     workspaceId!: number;
-
-
+    deletedMember: any = null;
 
     initForm() {
         this.params = this.fb.group({
@@ -73,10 +62,10 @@ export class MembersComponent {
     }
 
     ngOnInit() {
-        this.route.params.subscribe(params => {
-            this.workspaceId = params['workspaceId'];    
-            console.log("hhhhhh",this.workspaceId);        
-          });
+        this.route.params.subscribe((params) => {
+            this.workspaceId = params['workspaceId'];
+            console.log(this.workspaceId);
+        });
         this.searchContacts();
         this.getUsers();
     }
@@ -89,15 +78,39 @@ export class MembersComponent {
         });
     }
 
-    removeUser(id: number) {
-        console.log("remove user ")
-        this.userService.removeUser(id).subscribe({
+    // removeUser(id: number) {
+    //     console.log("remove user ")
+    //     this.userService.removeUser(id, this.workspaceId).subscribe({
+    //         next: () => {
+    //             console.log('remove user after next');
+    //             this.filteredMembersList = this.filteredMembersList.filter((member) => member.userId !== id);
+    //             this.memberList = this.memberList.filter((member) => member.userId !== id);
+    //             this.showMessage('User has been deleted successfully.');
+    //             console.log('member deleted successfully');
+    //         },
+    //         error: (err) => {
+    //             console.error('Error deleting member:', err);
+    //         },
+    //     });
+    // }
+
+    deleteMemberConfirm(member: any) {
+        setTimeout(() => {
+            this.deletedMember = member;
+            this.isDeleteMemeberModal.open();
+        }, 10);
+    }
+
+    deleteMember() {
+        this.userService.removeUser(this.deletedMember.userId, this.workspaceId).subscribe({
             next: () => {
-                console.log('remove user after next');
-                this.filteredMembersList = this.filteredMembersList.filter((member) => member.userId !== id);
-                this.memberList = this.memberList.filter((member) => member.userId !== id);
-                this.showMessage('User has been deleted successfully.');
-                console.log('member deleted successfully');
+                console.log('member after next');
+                this.filteredMembersList = this.filteredMembersList.filter((member) => member.userId !== this.deletedMember.userId);
+                this.memberList = this.memberList.filter((member) => member.userId !== this.deletedMember.userId);
+                this.getUsers();
+                this.showMessage('member has been deleted successfully.');
+                console.log('member deleted successfully:');
+                this.isDeleteMemeberModal.close();
             },
             error: (err) => {
                 console.error('Error deleting member:', err);
@@ -109,7 +122,7 @@ export class MembersComponent {
     searchContacts() {
         this.filteredMembersList = this.memberList.filter(
             (member: UserResponse) =>
-            member.firstName.toLowerCase().includes(this.searchUser.toLowerCase()) || member.lastName.toLowerCase().includes(this.searchUser.toLowerCase())
+                member.firstName.toLowerCase().includes(this.searchUser.toLowerCase()) || member.lastName.toLowerCase().includes(this.searchUser.toLowerCase())
         );
     }
 
@@ -149,9 +162,9 @@ export class MembersComponent {
             user.role = this.params.value.role;
         } else {
             //add user
-            let maxUserId = this.memberList.length ?
-                this.memberList.reduce((max: number, character: UserResponse) => (character.userId > max ? character.userId : max), this.memberList[0].userId) :
-                0;
+            let maxUserId = this.memberList.length
+                ? this.memberList.reduce((max: number, character: UserResponse) => (character.userId > max ? character.userId : max), this.memberList[0].userId)
+                : 0;
 
             let user: UserResponse = {
                 userId: maxUserId + 1,
@@ -177,7 +190,7 @@ export class MembersComponent {
             showConfirmButton: false,
             timer: 3000,
             customClass: {
-                container: 'toast'
+                container: 'toast',
             },
         });
         toast.fire({
