@@ -4,8 +4,7 @@
         <div
             class="absolute z-10 hidden h-full w-full rounded-md bg-black/60"
             [ngClass]="{ '!block xl:!hidden': isShowWorkspaceMenu }"
-            (click)="isShowWorkspaceMenu = !isShowWorkspaceMenu"
-        ></div>
+            (click)="isShowWorkspaceMenu = !isShowWorkspaceMenu"></div>
 
 
         <modal #isAddWorkspaceModal class="no-footer">
@@ -47,6 +46,25 @@
                 </form>
             </ng-template>
         </modal>
+
+        <modal #isDeleteWorkspaceModal class="no-footer">
+                <ng-template #modalHeader>
+                    <div class="!font-medium">Delete Workspace</div>
+                </ng-template>
+                <ng-template #modalBody>
+                    <div class="text-center text-sm">
+                        <div class="mx-auto w-fit rounded-full bg-danger p-4 text-white ring-4 ring-danger/30">
+                            <icon-trash-lines class="mx-auto h-7 w-7" />
+                        </div>
+                        <div class="mx-auto mt-5 sm:w-3/4">Are you sure you want to delete Workspace?</div>
+
+                        <div class="mt-8 flex items-center justify-center">
+                            <button type="button" class="btn btn-outline-danger" (click)="isDeleteWorkspaceModal.close()">Cancel</button>
+                            <button type="button" class="btn bg-lime-800 hover:bg-lime-700 text-white ltr:ml-4 rtl:mr-4" (click)="deleteWorkspace()">Delete</button>
+                        </div>
+                    </div>
+                </ng-template>
+            </modal>
     
 
 
@@ -74,14 +92,12 @@
                         <ng-container *ngFor="let works of filtredWorkspaces">
                             <div class="panel pb-1" >
                                 <div class="-m-5 mb-5 flex items-center justify-between  border-[#e0e6ed] p-5 dark:border-[#1b2e4b]">
-                                    <a href="javascript:;" class="flex font-semibold">
+                                    <a href="javascript:;" class="flex font-semibold" (click)="viewWorkspace(works)">
                                         <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-dark text-white ltr:mr-4 rtl:ml-4">
                                             <span>{{ works.name.slice(0, 2).toUpperCase() }}</span>
                                         </div>
                                         <div>
                                             <h3 class="text-base max-w-lg text-xl font-semibold leading-normal text-gray-900 dark:text-dark">{{ works.name  }}</h3>
-
-
                                             <p class="mt-1 text-xs text-white-dark">JobInTech</p>
                                         </div>
                                     </a>
@@ -97,7 +113,7 @@
                                                 </a>
                                             </li>
                                             <li>
-                                                <a href="javascript:;" class="w-full text-red-500" *hlMenuItem="let menuItem" (click)="deleteWorkspace(works.workspaceId)">
+                                                <a href="javascript:;" class="w-full text-red-500" *hlMenuItem="let menuItem" (click)="deleteWorkspaceConfirm(works)">
                                                     <icon-trash-lines class="h-4.5 w-4.5 shrink-0 ltr:mr-3 rtl:ml-3" />
                                                     Delete
                                                 </a>

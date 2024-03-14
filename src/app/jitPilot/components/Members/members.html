@@ -72,7 +72,7 @@
                                 <td>
                                     <div class="flex items-center justify-center gap-4">
                                         <button type="button" class="btn btn-sm btn-outline-danger"
-                                            (click)="removeUser(member.userId)">Remove</button>
+                                            (click)="deleteMemberConfirm(member)">Remove</button>
                                     </div>
                                 </td>
                             </tr>
@@ -148,4 +148,24 @@
             </form>
         </ng-template>
     </modal>
+
+    <modal #isDeleteMemeberModal class="no-footer">
+        <ng-template #modalHeader>
+            <div class="!font-medium">remove Member in workspace</div>
+        </ng-template>
+        <ng-template #modalBody>
+            <div class="text-center text-sm">
+                <div class="mx-auto w-fit rounded-full bg-danger p-4 text-white ring-4 ring-danger/30">
+                    <icon-trash-lines class="mx-auto h-7 w-7" />
+                </div>
+                <div class="mx-auto mt-5 sm:w-3/4">Are you sure you want to remove member?</div>
+
+                <div class="mt-8 flex items-center justify-center">
+                    <button type="button" class="btn btn-outline-danger" (click)="isDeleteMemeberModal.close()">Cancel</button>
+                    <button type="button" class="btn btn-primary ltr:ml-4 rtl:mr-4" (click)="deleteMember()">Delete</button>
+                </div>
+            </div>
+        </ng-template>
+    </modal>
+
 </div>

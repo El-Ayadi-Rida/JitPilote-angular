@@ -33,12 +33,12 @@ export class UserService {
         return this.http.put(url, user, this.httpOptions);
     }
 
-    removeUser(id: number): Observable<void> {
-        const url = `${this.apiUrl}/${id}`;
+    removeUser(id: number, idWorkspace: number): Observable<void> {
+        const url = `${environment.URL_API}/workspaces/${idWorkspace}/removeUser/${id}`;
         return this.http.delete<void>(url);
     }
 
-    getUserByWorkspace(workspacedId:number): Observable<UserResponse[]> {
+    getUserByWorkspace(workspacedId: number): Observable<UserResponse[]> {
         return this.http.get<UserResponse[]>(`${environment.URL_API}/workspaces/${workspacedId}/users`);
     }
 }

@@ -5,21 +5,24 @@ import { environment } from 'src/environments/environment.development';
 import { Ticket } from '../models/ticket';
 
 @Injectable({
-  providedIn: 'root'
+    providedIn: 'root',
 })
 export class TicketService {
+    constructor(private http: HttpClient) {}
 
-  constructor(private http:HttpClient) { }
+    newTicket(sectionId: number, ticket: Ticket): Observable<Ticket> {
+        return this.http.post<Ticket>(`${environment.URL_API}/tickets/${sectionId}`, ticket);
+    }
 
-  newTicket(sectionId: number,ticket:Ticket):Observable<Ticket>{
-    return this.http.post<Ticket>(`${environment.URL_API}/tickets/${sectionId}`,ticket);
-  }
+    updateTicket(ticketId: number, ticket: Ticket): Observable<Ticket> {
+        return this.http.put<Ticket>(`${environment.URL_API}/tickets/${ticketId}`, ticket);
+    }
 
-  updateTicket(ticketId: number,ticket:Ticket):Observable<Ticket>{
-    return this.http.put<Ticket>(`${environment.URL_API}/tickets/${ticketId}`,ticket);
-  }
+    deleteTicket(ticketId: number): Observable<Ticket> {
+        return this.http.delete<Ticket>(`${environment.URL_API}/tickets/${ticketId}`);
+    }
 
-  deleteTicket(ticketId: number):Observable<Ticket>{
-    return this.http.delete<Ticket>(`${environment.URL_API}/tickets/${ticketId}`);
-  }
+    deleteAllTicket(sectionId: number): Observable<Ticket> {
+        return this.http.delete<Ticket>(`${environment.URL_API}/tickets/deleteAll/${sectionId}`);
+    }
 }
