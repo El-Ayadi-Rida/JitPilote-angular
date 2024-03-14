@@ -37,6 +37,7 @@ import { WorkspaceComponent } from './components/workspace/workspace.component';
 import { ModalModule } from 'angular-custom-modal';
 import { MembersComponent } from './components/Members/members';
 import { WorkspaceDetailsComponent } from './components/workspace/workspaceDetails';
+import { TicketDetailsComponent } from './components/board/ticket-details/ticket-details.component';
 
 const routes: Routes = [
     { path: 'jitPilot/scrumboard/:boardId', component: BoardDetailsComponent, title: 'Scrumboard | JitPilot' },
@@ -74,7 +75,8 @@ const routes: Routes = [
         TodolistComponent,
         CalendarComponent,
         WorkspaceComponent,
-        WorkspaceDetailsComponent
+        WorkspaceDetailsComponent,
+        TicketDetailsComponent
 
     ],
 })
