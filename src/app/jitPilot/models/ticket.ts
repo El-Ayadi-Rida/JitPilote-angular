@@ -13,4 +13,5 @@ export interface Ticket {
     assignedToUserId: number;
     tasks: Task[];
     users: UserResponse[];
+    endDate:Date;
 }
