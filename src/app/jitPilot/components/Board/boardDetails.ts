@@ -363,4 +363,6 @@ export class BoardDetailsComponent implements OnInit {
         }
     }
 
+    //chnqges
+
 }
