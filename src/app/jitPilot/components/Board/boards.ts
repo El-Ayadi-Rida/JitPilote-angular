@@ -144,6 +144,7 @@ export class BoardsComponent {
                 description: this.params.value.description,
                 accessLevel: this.params.value.accessLevel,
                 templateType:this.params.value.templateType,
+                
               };
             this.boardService.newBoard(
                 1,

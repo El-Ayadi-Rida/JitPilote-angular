@@ -18,11 +18,8 @@
     <div class="relative pt-5">
         <div class="-mx-2 h-full">
             <div class="flex flex-nowrap items-start gap-5 overflow-x-auto px-2 pb-2">
-                <ng-container *ngFor="let section of sectionList" key="section.id"
-                >
-                    <div class="panel w-80 flex-none" 
-                    (dragover)="onDragOver($event)" 
-                    (drop)="onDrop($event,section.sectionId)">
+                <ng-container *ngFor="let section of sectionList" key="section.id">
+                    <div class="panel w-80 flex-none">
                         <div class="mb-5 flex justify-between">
                             <h4 class="text-base font-semibold">{{ section.sectionTitle }}</h4>
 
@@ -50,19 +47,18 @@
                             [sortablejsOptions]="{ animation: 200, group: 'default', ghostClass: 'sortable-ghost', dragClass:'sortable-drag' }"
                             class="connect-sorting-content min-h-[150px]"
                         >
-                            <div class="sortable-list" *ngFor="let ticket of section.tickets" 
-                            key="section.sectionId + '' + ticket.ticketId"
-                            draggable="true"  (dragstart)="onDragStart(ticket.ticketId)"
-
-                            >
-                                <div class="mb-5 cursor-move space-y-3 rounded-md bg-[#f4f4f4] p-3 pb-5 shadow dark:bg-white-dark/20">
+                            <div class="sortable-list" *ngFor="let ticket of section.tickets" key="section.sectionId + '' + ticket.ticketId">
+                                <div class="mb-5 cursor-move space-y-3 rounded-md bg-[#f4f4f4] p-3 pb-5 shadow dark:bg-white-dark/20"
+                                >
                                     <!-- if ticket have image -->
                                     <!-- <ng-container *ngIf="ticket.title">
                                         <img src="/assets/images/carousel1.jpeg" alt="images" class="h-32 w-full rounded-md object-cover" />
                                     </ng-container> -->
                                     <div class="text-base font-medium">{{ ticket.title }}</div>
                                     <p class="break-all">{{ ticket.description }}</p>
-                                    <div class="flex flex-wrap items-center gap-2">
+                                    <div class="flex flex-wrap items-center gap-2"
+                                    (click)="ViewTicketModal(ticket)"
+                                    >
                                         <ng-container *ngIf="ticket.priority !== 'LOW'; else elseBlock">
                                                 <div class="btn btn-outline-primary flex px-2 py-1">
                                                     <icon-tag class="shrink-0" />
@@ -82,7 +78,7 @@
                                     <div class="flex items-center justify-between">
                                         <div class="flex items-center font-medium hover:text-primary">
                                             <icon-calendar class="shrink-0 ltr:mr-3 rtl:ml-3" />
-                                            <span>{{ ticket.status }}</span>
+                                            <span>{{ ticket.endDate | date:'yyyy-MM-dd' }}</span>
                                         </div>
                                         <div class="flex items-center">
                                             <button type="button" class="hover:text-info" (click)="addEditTicket(ticket,section.sectionId)">
@@ -134,7 +130,7 @@
     <!-- add task modal -->
     <modal #isAddTaskModal class="no-footer">
         <ng-template #modalHeader>
-            <div class="!font-medium">{{ paramsTicket.ticketId ? 'Edit Task' : 'Add Ticket' }}</div>
+            <div class="!font-medium">{{ paramsTicket.ticketId ? 'Edit Ticket' : 'Add Ticket' }}</div>
         </ng-template>
         <ng-template #modalBody>
             <form (ngSubmit)="saveTicket()" class="text-sm">
@@ -227,4 +223,69 @@
             </div>
         </ng-template>
     </modal>
+        <!-- View Ticket details modal -->
+        <modal #isViewTicketModal class="no-footer modal-top extra-large-modal">
+            <ng-template #modalHeader>
+                <div class="!font-medium">{{ paramsTicket.title}}</div>
+            </ng-template>
+            <ng-template #modalBody>
+                <form (ngSubmit)="saveTicket()" class="text-sm">
+                    <div class="grid gap-5">
+                        
+                        <div >
+                            <label for="title">Title</label>
+                            <input id="taskTitle" [(ngModel)]="paramsTicket.title" name="title" type="text" class="form-input" placeholder="Enter Name" />
+                        </div>
+                        <div>
+                            <label for="taskdesc">Description</label>
+                            <textarea
+                                id="taskdesc"
+                                [(ngModel)]="paramsTicket.description"
+                                name="description"
+                                class="form-textarea min-h-[130px]"
+                                placeholder="Enter Description"
+                            ></textarea>
+                        </div>
+                        <div >
+                            <label for="tasks">Tasks</label>
+                            <table class="table-hover">
+                                <tbody>
+                                    <ng-container *ngFor="let task of tasks">
+                                        <tr class="group cursor-pointer" [ngClass]="{ 'bg-white-light/30 dark:bg-[#1a2941]': task.done }">
+                                            <td class="w-1">
+                                                <input
+                                                    type="checkbox"
+                                                    [id]="'chk-' +task.taskId"
+                                                    class="form-checkbox"
+                                                    [checked]="task.done"
+                                                    (click)="$event.stopPropagation();taskComplete(task)"
+                                                    [disabled]="selectedTab === 'trash'"
+                                                />
+                                            </td>
+                                            <td>
+                                                <div >
+                                                    <div
+                                                        class="whitespace-nowrap text-base font-semibold group-hover:text-primary"
+                                                        [ngClass]="{ 'line-through': task.done }"
+                                                    >
+                                                        {{ task.title }}
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </ng-container>
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+    
+                    <div class="mt-8 flex items-center justify-end">
+                        <button type="button" class="btn btn-outline-danger" (click)="isViewTicketModal.close()">Close</button>
+                        <button type="submit" class="btn btn-primary ltr:ml-4 rtl:mr-4">Save</button>
+                    </div>
+                </form>
+            </ng-template>
+        </modal>
 </div>
+

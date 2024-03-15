@@ -25,9 +25,4 @@ export class TicketService {
     deleteAllTicket(sectionId: number): Observable<Ticket> {
         return this.http.delete<Ticket>(`${environment.URL_API}/tickets/deleteAll/${sectionId}`);
     }
-
-    updateTickectSection(tickectId: number,sectionId: number): Observable<Ticket> {
-        return this.http.put<Ticket>(`${environment.URL_API}/tickets/${tickectId}/section/${sectionId}`,{});
-    }
 }
-

@@ -12,8 +12,9 @@ import { TicketPriority } from '../../models/ticket-priority';
 import { TicketStatus } from '../../models/ticket-status';
 import { Ticket } from '../../models/ticket';
 import { TicketService } from '../../services/ticket.service';
-import { CdkDragDrop } from '@angular/cdk/drag-drop';
-
+import { retry } from 'rxjs';
+import { Task } from '../../models/task';
+import { TaskService } from '../../services/task.service';
 
 @Component({
     moduleId: module.id,
@@ -31,7 +32,8 @@ export class BoardDetailsComponent implements OnInit {
         public fb: FormBuilder,
         private boardService: BoardService,
         private sectionService: SectionService,
-        private ticketService: TicketService
+        private ticketService: TicketService,
+        private taskService:TaskService
     ) {}
     ngOnInit(): void {
         this.route.params.subscribe((params) => {
@@ -61,76 +63,64 @@ export class BoardDetailsComponent implements OnInit {
         description: '',
         priority: TicketPriority.HIGH,
         status: TicketStatus.IN_PROGRESS,
+        tasks:[]
     };
+    editorOptions = {
+        toolbar: [[{ header: [1, 2, false] }], ['bold', 'italic', 'underline', 'link'], [{ list: 'ordered' }, { list: 'bullet' }], ['clean']],
+    };
+
     selectedTask: any = null;
     @ViewChild('isAddProjectModal') isAddProjectModal!: ModalComponent;
     @ViewChild('isAddTaskModal') isAddTaskModal!: ModalComponent;
     @ViewChild('isDeleteModal') isDeleteModal!: ModalComponent;
     @ViewChild('isDeleteSectionModal') isDeleteSelectionModal!: ModalComponent;
     @ViewChild('isClearAlllModal') isClearAlllModal!: ModalComponent;
-    projectList: any = [
+    @ViewChild('isViewTicketModal') isViewTicketModal!: ModalComponent;
+    selectedTab = '';
+    allTasks:any = [
         {
             id: 1,
-            title: 'In Progress',
-            tasks: [
-                {
-                    projectId: 1,
-                    id: 1.1,
-                    title: 'Creating a new Portfolio on Dribble',
-                    description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.',
-                    image: true,
-                    date: ' 08 Aug, 2020',
-                    tags: ['designing'],
-                },
-                {
-                    projectId: 1,
-                    id: 1.2,
-                    title: 'Singapore Team Meet',
-                    description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.',
-                    date: ' 09 Aug, 2020',
-                    tags: ['meeting'],
-                },
-            ],
+            title: 'Meeting with Shaun Park at 4:50pm',
+            date: 'Aug, 07 2020',
+            description:
+                'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi pulvinar feugiat consequat. Duis lacus nibh, sagittis id varius vel, aliquet non augue. Vivamus sem ante, ultrices at ex a, rhoncus ullamcorper tellus. Nunc iaculis eu ligula ac consequat. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vestibulum mattis urna neque, eget posuere lorem tempus non. Suspendisse ac turpis dictum, convallis est ut, posuere sem. Etiam imperdiet aliquam risus, eu commodo urna vestibulum at. Suspendisse malesuada lorem eu sodales aliquam.',
+            descriptionText:
+                'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi pulvinar feugiat consequat. Duis lacus nibh, sagittis id varius vel, aliquet non augue. Vivamus sem ante, ultrices at ex a, rhoncus ullamcorper tellus. Nunc iaculis eu ligula ac consequat. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vestibulum mattis urna neque, eget posuere lorem tempus non. Suspendisse ac turpis dictum, convallis est ut, posuere sem. Etiam imperdiet aliquam risus, eu commodo urna vestibulum at. Suspendisse malesuada lorem eu sodales aliquam.',
+            tag: 'team',
+            priority: 'medium',
+            assignee: 'John Smith',
+            path: '',
+            status: '',
         },
         {
             id: 2,
-            title: 'Pending',
-            tasks: [
-                {
-                    projectId: 2,
-                    id: 2.1,
-                    title: 'Plan a trip to another country',
-                    description: '',
-                    date: ' 10 Sep, 2020',
-                },
-            ],
+            title: 'Team meet at Starbucks',
+            date: 'Aug, 06 2020',
+            description:
+                'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi pulvinar feugiat consequat. Duis lacus nibh, sagittis id varius vel, aliquet non augue. Vivamus sem ante, ultrices at ex a, rhoncus ullamcorper tellus. Nunc iaculis eu ligula ac consequat. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vestibulum mattis urna neque, eget posuere lorem tempus non. Suspendisse ac turpis dictum, convallis est ut, posuere sem. Etiam imperdiet aliquam risus, eu commodo urna vestibulum at. Suspendisse malesuada lorem eu sodales aliquam.',
+            descriptionText:
+                'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi pulvinar feugiat consequat. Duis lacus nibh, sagittis id varius vel, aliquet non augue. Vivamus sem ante, ultrices at ex a, rhoncus ullamcorper tellus. Nunc iaculis eu ligula ac consequat. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vestibulum mattis urna neque, eget posuere lorem tempus non. Suspendisse ac turpis dictum, convallis est ut, posuere sem. Etiam imperdiet aliquam risus, eu commodo urna vestibulum at. Suspendisse malesuada lorem eu sodales aliquam.',
+            tag: 'team',
+            priority: 'low',
+            assignee: 'John Smith',
+            path: 'profile-15.jpeg',
+            status: '',
         },
         {
             id: 3,
-            title: 'Complete',
-            tasks: [
-                {
-                    projectId: 3,
-                    id: 3.1,
-                    title: 'Dinner with Kelly Young',
-                    description: '',
-                    date: ' 08 Aug, 2020',
-                },
-                {
-                    projectId: 3,
-                    id: 3.2,
-                    title: 'Launch New SEO Wordpress Theme ',
-                    description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-                    date: ' 09 Aug, 2020',
-                },
-            ],
-        },
-        {
-            id: 4,
-            title: 'Working',
-            tasks: [],
-        },
-    ];
+            title: 'Meet Lisa to discuss project details',
+            date: 'Aug, 05 2020',
+            description:
+                'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi pulvinar feugiat consequat. Duis lacus nibh, sagittis id varius vel, aliquet non augue. Vivamus sem ante, ultrices at ex a, rhoncus ullamcorper tellus. Nunc iaculis eu ligula ac consequat. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vestibulum mattis urna neque, eget posuere lorem tempus non. Suspendisse ac turpis dictum, convallis est ut, posuere sem. Etiam imperdiet aliquam risus, eu commodo urna vestibulum at. Suspendisse malesuada lorem eu sodales aliquam.',
+            descriptionText:
+                'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi pulvinar feugiat consequat. Duis lacus nibh, sagittis id varius vel, aliquet non augue. Vivamus sem ante, ultrices at ex a, rhoncus ullamcorper tellus. Nunc iaculis eu ligula ac consequat. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vestibulum mattis urna neque, eget posuere lorem tempus non. Suspendisse ac turpis dictum, convallis est ut, posuere sem. Etiam imperdiet aliquam risus, eu commodo urna vestibulum at. Suspendisse malesuada lorem eu sodales aliquam.',
+            tag: 'update',
+            priority: 'medium',
+            assignee: 'John Smith',
+            path: 'profile-1.jpeg',
+            status: 'complete',
+        }
+    ]
     getBoardById() {
         this.boardService.getBoardById(this.boardId).subscribe(
             (response) => {
@@ -216,7 +206,15 @@ export class BoardDetailsComponent implements OnInit {
             this.isClearAlllModal.open();
         }, 10);
     }
-
+    tasks!:Task[]
+    ViewTicketModal(ticket: any = null) {
+        setTimeout(() => {
+            this.paramsTicket = JSON.parse(JSON.stringify(ticket));
+            this.tasks = this.paramsTicket.tasks
+            console.log(this.tasks);           
+            this.isViewTicketModal.open();
+        }, 10);
+    }
     clearAllTicket() {
         this.ticketService.deleteAllTicket(this.sectionToClear.sectionId).subscribe({
             next: () => {
@@ -229,6 +227,7 @@ export class BoardDetailsComponent implements OnInit {
             },
         });
     }
+
 
     deleteSection() {
         this.sectionService.deleteSection(this.deletedSection.sectionId).subscribe({
@@ -257,6 +256,7 @@ export class BoardDetailsComponent implements OnInit {
             description: '',
             priority: TicketPriority.HIGH,
             status: TicketStatus.IN_PROGRESS,
+            tasks:[]
         };
         if (ticket) {
             this.paramsTicket = JSON.parse(JSON.stringify(ticket));
@@ -347,31 +347,20 @@ export class BoardDetailsComponent implements OnInit {
             padding: '10px 20px',
         });
     }
-
-    
-    currentTicketToDrag!:any;
-    
-    onDragStart(ticketId: number){
-        this.currentTicketToDrag=ticketId;
-    }
-
-    onDrop(event: any,sectionId:number){
-        event.preventDefault();
-        this.ticketService.updateTickectSection(this.currentTicketToDrag, sectionId)
-          .subscribe({
-            next: () => {
-                this.getBoardById();
-                this.showMessage('Ticket updated successfully.');
-            },
-            error: (err) => {
-                console.error('Error draging Ticket:', err);
-            },
-        });
-        this.currentTicketToDrag=null;
-    }
-
-    onDragOver(event: any){
-        event.preventDefault();
+    filteredTasks: any = [];
+    taskComplete(task: any = null) {
+        if (task) {
+            task.done = !task.done;
+            this.taskService.updateTask(task.taskId, task).subscribe(
+                (response) => {
+                    console.log('task updated successfully:', response);
+                    this.getBoardById();
+                },
+                (error) => {
+                    console.error('Error updating task:', error);
+                }
+            );
+        }
     }
 
 }
