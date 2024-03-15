@@ -374,4 +374,6 @@ export class BoardDetailsComponent implements OnInit {
         event.preventDefault();
     }
 
+    //chnqges
+
 }
