@@ -363,6 +363,31 @@ export class BoardDetailsComponent implements OnInit {
         }
     }
 
-    //chnqges
+      
+    currentTicketToDrag!:any;
+    
+    onDragStart(ticketId: number){
+        this.currentTicketToDrag=ticketId;
+    }
+
+    onDrop(event: any,sectionId:number){
+        event.preventDefault();
+        this.ticketService.updateTickectSection(this.currentTicketToDrag, sectionId)
+          .subscribe({
+            next: () => {
+                this.getBoardById();
+                this.showMessage('Ticket updated successfully.');
+            },
+            error: (err) => {
+                console.error('Error draging Ticket:', err);
+            },
+        });
+        this.currentTicketToDrag=null;
+    }
+
+    onDragOver(event: any){
+        event.preventDefault();
+    }
+
 
 }
