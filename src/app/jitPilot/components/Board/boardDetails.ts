@@ -49,9 +49,14 @@ export class BoardDetailsComponent implements OnInit {
     sectionList!: Section[];
     deletedSection!: Section;
     workspaceId!: number;
-    currentSectionId!: number;
+    currentSection!: Section;
     ticketToDelete!: Ticket;
+    taskToDelete!: Task;
     sectionToClear!: Section;
+    TasksList!:Task[];
+    progress!:string;
+    currentTicket!:Ticket
+
     params = {
         sectionId: null,
         sectionTitle: '',
@@ -61,66 +66,31 @@ export class BoardDetailsComponent implements OnInit {
         ticketId: null,
         title: '',
         description: '',
+        descriptionContent: '',
         priority: TicketPriority.HIGH,
         status: TicketStatus.IN_PROGRESS,
         tasks:[]
     };
+    paramsTask = {
+        taskId: null,
+        title:'',
+        done:false
+
+    }
     editorOptions = {
         toolbar: [[{ header: [1, 2, false] }], ['bold', 'italic', 'underline', 'link'], [{ list: 'ordered' }, { list: 'bullet' }], ['clean']],
     };
 
-    selectedTask: any = null;
-    @ViewChild('isAddProjectModal') isAddProjectModal!: ModalComponent;
-    @ViewChild('isAddTaskModal') isAddTaskModal!: ModalComponent;
+    @ViewChild('isAddSectionModal') isAddSectionModal!: ModalComponent;
+    @ViewChild('isAddTicketModal') isAddTicketModal!: ModalComponent;
     @ViewChild('isDeleteModal') isDeleteModal!: ModalComponent;
+    @ViewChild('isDeleteTaskModal') isDeleteTaskModal!: ModalComponent;
     @ViewChild('isDeleteSectionModal') isDeleteSelectionModal!: ModalComponent;
     @ViewChild('isClearAlllModal') isClearAlllModal!: ModalComponent;
     @ViewChild('isViewTicketModal') isViewTicketModal!: ModalComponent;
+    @ViewChild('isAddTaskModal') isAddTaskModal!: ModalComponent;
     selectedTab = '';
-    allTasks:any = [
-        {
-            id: 1,
-            title: 'Meeting with Shaun Park at 4:50pm',
-            date: 'Aug, 07 2020',
-            description:
-                'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi pulvinar feugiat consequat. Duis lacus nibh, sagittis id varius vel, aliquet non augue. Vivamus sem ante, ultrices at ex a, rhoncus ullamcorper tellus. Nunc iaculis eu ligula ac consequat. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vestibulum mattis urna neque, eget posuere lorem tempus non. Suspendisse ac turpis dictum, convallis est ut, posuere sem. Etiam imperdiet aliquam risus, eu commodo urna vestibulum at. Suspendisse malesuada lorem eu sodales aliquam.',
-            descriptionText:
-                'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi pulvinar feugiat consequat. Duis lacus nibh, sagittis id varius vel, aliquet non augue. Vivamus sem ante, ultrices at ex a, rhoncus ullamcorper tellus. Nunc iaculis eu ligula ac consequat. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vestibulum mattis urna neque, eget posuere lorem tempus non. Suspendisse ac turpis dictum, convallis est ut, posuere sem. Etiam imperdiet aliquam risus, eu commodo urna vestibulum at. Suspendisse malesuada lorem eu sodales aliquam.',
-            tag: 'team',
-            priority: 'medium',
-            assignee: 'John Smith',
-            path: '',
-            status: '',
-        },
-        {
-            id: 2,
-            title: 'Team meet at Starbucks',
-            date: 'Aug, 06 2020',
-            description:
-                'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi pulvinar feugiat consequat. Duis lacus nibh, sagittis id varius vel, aliquet non augue. Vivamus sem ante, ultrices at ex a, rhoncus ullamcorper tellus. Nunc iaculis eu ligula ac consequat. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vestibulum mattis urna neque, eget posuere lorem tempus non. Suspendisse ac turpis dictum, convallis est ut, posuere sem. Etiam imperdiet aliquam risus, eu commodo urna vestibulum at. Suspendisse malesuada lorem eu sodales aliquam.',
-            descriptionText:
-                'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi pulvinar feugiat consequat. Duis lacus nibh, sagittis id varius vel, aliquet non augue. Vivamus sem ante, ultrices at ex a, rhoncus ullamcorper tellus. Nunc iaculis eu ligula ac consequat. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vestibulum mattis urna neque, eget posuere lorem tempus non. Suspendisse ac turpis dictum, convallis est ut, posuere sem. Etiam imperdiet aliquam risus, eu commodo urna vestibulum at. Suspendisse malesuada lorem eu sodales aliquam.',
-            tag: 'team',
-            priority: 'low',
-            assignee: 'John Smith',
-            path: 'profile-15.jpeg',
-            status: '',
-        },
-        {
-            id: 3,
-            title: 'Meet Lisa to discuss project details',
-            date: 'Aug, 05 2020',
-            description:
-                'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi pulvinar feugiat consequat. Duis lacus nibh, sagittis id varius vel, aliquet non augue. Vivamus sem ante, ultrices at ex a, rhoncus ullamcorper tellus. Nunc iaculis eu ligula ac consequat. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vestibulum mattis urna neque, eget posuere lorem tempus non. Suspendisse ac turpis dictum, convallis est ut, posuere sem. Etiam imperdiet aliquam risus, eu commodo urna vestibulum at. Suspendisse malesuada lorem eu sodales aliquam.',
-            descriptionText:
-                'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi pulvinar feugiat consequat. Duis lacus nibh, sagittis id varius vel, aliquet non augue. Vivamus sem ante, ultrices at ex a, rhoncus ullamcorper tellus. Nunc iaculis eu ligula ac consequat. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vestibulum mattis urna neque, eget posuere lorem tempus non. Suspendisse ac turpis dictum, convallis est ut, posuere sem. Etiam imperdiet aliquam risus, eu commodo urna vestibulum at. Suspendisse malesuada lorem eu sodales aliquam.',
-            tag: 'update',
-            priority: 'medium',
-            assignee: 'John Smith',
-            path: 'profile-1.jpeg',
-            status: 'complete',
-        }
-    ]
+
     getBoardById() {
         this.boardService.getBoardById(this.boardId).subscribe(
             (response) => {
@@ -133,7 +103,8 @@ export class BoardDetailsComponent implements OnInit {
             }
         );
     }
-    addEditProject(section: any = null) {
+
+    addEditSection(section: any = null) {
         setTimeout(() => {
             this.params = {
                 sectionId: null,
@@ -143,7 +114,7 @@ export class BoardDetailsComponent implements OnInit {
             if (section) {
                 this.params = JSON.parse(JSON.stringify(section));
             }
-            this.isAddProjectModal.open();
+            this.isAddSectionModal.open();
         });
     }
 
@@ -164,7 +135,8 @@ export class BoardDetailsComponent implements OnInit {
             this.sectionService.updateSection(this.params.sectionId, sectionToUpdate).subscribe(
                 (response) => {
                     console.log('section updated successfully:', response);
-                    this.getBoardById();
+                    let section:any = this.sectionList.find((section: any) => section.sectionId === this.params.sectionId);
+                    section.sectionTitle = sectionToUpdate.sectionTitle;
                 },
                 (error) => {
                     console.error('Error updating section:', error);
@@ -181,7 +153,7 @@ export class BoardDetailsComponent implements OnInit {
             this.sectionService.newSection(this.boardId, newSection).subscribe(
                 (response) => {
                     console.log('section added successfully:', response);
-                    this.getBoardById();
+                    this.sectionList.push(response);
                 },
                 (error) => {
                     console.error('Error adding section:', error);
@@ -190,12 +162,12 @@ export class BoardDetailsComponent implements OnInit {
         }
 
         this.showMessage('section has been saved successfully.');
-        this.isAddProjectModal.close();
+        this.isAddSectionModal.close();
     }
 
     deleteSectionConfirm(section: Section) {
         setTimeout(() => {
-            this.deletedSection = section;
+            this.currentSection = section;
             this.isDeleteSelectionModal.open();
         });
     }
@@ -207,18 +179,27 @@ export class BoardDetailsComponent implements OnInit {
         }, 10);
     }
     tasks!:Task[]
-    ViewTicketModal(ticket: any = null) {
+    ViewTicketModal(ticket: Ticket , section:Section) {
         setTimeout(() => {
+            this.currentSection = section;
             this.paramsTicket = JSON.parse(JSON.stringify(ticket));
-            this.tasks = this.paramsTicket.tasks
-            console.log(this.tasks);           
+            this.taskService.getTasksByTicket(ticket.ticketId).subscribe(
+                (response) => {
+                    console.log('tasks fetched successfully:', response);
+                    this.TasksList = response;
+                },
+                (error) => {
+                    console.error('Error gettig Tasks of ticket:'+ticket.ticketId, error);
+                }
+            );  
             this.isViewTicketModal.open();
+            
         }, 10);
     }
     clearAllTicket() {
         this.ticketService.deleteAllTicket(this.sectionToClear.sectionId).subscribe({
             next: () => {
-                this.getBoardById();
+                this.sectionToClear.tickets = [];
                 this.showMessage('all Ticket has been deleted successfully.');
                 this.isClearAlllModal.close();
             },
@@ -233,8 +214,7 @@ export class BoardDetailsComponent implements OnInit {
         this.sectionService.deleteSection(this.deletedSection.sectionId).subscribe({
             next: () => {
                 console.log('Section after next');
-                //this.sectionList = this.sectionList.filter((s)=>{s.sectionId !== this.deletedSection.sectionId;})
-                this.getBoardById();
+                this.sectionList = this.sectionList.filter((section: any) => section.sectionId != this.deletedSection.sectionId);
                 this.showMessage('Section has been deleted successfully.');
                 this.isDeleteSelectionModal.close();
             },
@@ -243,26 +223,23 @@ export class BoardDetailsComponent implements OnInit {
             },
         });
     }
-
-    clearProjects(project: any) {
-        project.tasks = [];
-    }
-
     // task
-    addEditTicket(ticket: any = null, sectionId: number) {
+    addEditTicket(ticket: any = null, section: Section) {
         this.paramsTicket = {
             ticketId: null,
             title: '',
             description: '',
+            descriptionContent: '',
             priority: TicketPriority.HIGH,
             status: TicketStatus.IN_PROGRESS,
             tasks:[]
         };
         if (ticket) {
             this.paramsTicket = JSON.parse(JSON.stringify(ticket));
+
         }
-        this.currentSectionId = sectionId;
-        this.isAddTaskModal.open();
+        this.currentSection = section;
+        this.isAddTicketModal.open();
     }
 
     saveTicket() {
@@ -272,18 +249,27 @@ export class BoardDetailsComponent implements OnInit {
         }
 
         if (this.paramsTicket.ticketId) {
-            //update task
+            //update task            
             const ticketToUpdate: any = {
                 ticketId: this.paramsTicket.ticketId,
                 title: this.paramsTicket.title,
                 description: this.paramsTicket.description,
                 priority: this.paramsTicket.priority,
                 status: this.paramsTicket.status,
+                descriptionContent:this.paramsTicket.descriptionContent
             };
+            console.log(ticketToUpdate);
+            
             this.ticketService.updateTicket(this.paramsTicket.ticketId, ticketToUpdate).subscribe(
                 (response) => {
                     console.log('ticket updated successfully:', response);
-                    this.getBoardById();
+                    const ticket:any = this.sectionList.find((section: any) => section.sectionId === this.currentSection.sectionId)
+                                            ?.tickets.find((ticket:any) => ticket.ticketId === this.paramsTicket.ticketId);
+                    ticket.title = ticketToUpdate.title;
+                    ticket.description = ticketToUpdate.description;
+                    ticket.descriptionContent = ticketToUpdate.descriptionContent;
+                    ticket.priority = ticketToUpdate.priority;
+                    ticket.status = ticketToUpdate.status;
                 },
                 (error) => {
                     console.error('Error updating ticket:', error);
@@ -297,11 +283,12 @@ export class BoardDetailsComponent implements OnInit {
                 description: this.paramsTicket.description,
                 priority: this.paramsTicket.priority,
                 status: this.paramsTicket.status,
+                descriptionContent:this.paramsTicket.description
             };
-            this.ticketService.newTicket(this.currentSectionId, newTicket).subscribe(
+            this.ticketService.newTicket(this.currentSection.sectionId, newTicket).subscribe(
                 (response) => {
                     console.log('Ticket added successfully:', response);
-                    this.getBoardById();
+                    this.sectionList.find((section: any) => section.sectionId === this.currentSection.sectionId)?.tickets.push(response);
                 },
                 (error) => {
                     console.error('Error adding Ticket:', error);
@@ -310,8 +297,72 @@ export class BoardDetailsComponent implements OnInit {
         }
 
         this.showMessage('ticket has been saved successfully.');
+        this.isAddTicketModal.close();
+    }
+    addEditTask(task: any = null, ticket: any = null) {
+        this.paramsTask = {
+            taskId: null,
+            title:'',
+            done:false
+    
+        }
+        if (task) {
+            this.paramsTask = JSON.parse(JSON.stringify(task));
+        }
+        this.currentTicket = ticket;
+        this.isAddTaskModal.open();
+    }
+    saveTask() {
+        console.log(this.paramsTask.title);
+        
+        if (!this.paramsTask.title) {
+            this.showMessage('Title is required.', 'error');
+            return;
+        }
+
+        if (this.paramsTask.taskId) {
+            //update task
+            const taskToUpdate: any = {
+                taskId: this.paramsTask.taskId,
+                title: this.paramsTask.title,
+                done: this.paramsTask.done
+            };
+            this.taskService.updateTask(this.paramsTask.taskId, taskToUpdate).subscribe(
+                (response) => {
+                    console.log('task updated successfully:', response);
+                    const task:any = this.TasksList.find((task:Task) => task.taskId === this.paramsTask.taskId);
+                    task.title = this.paramsTask.title;
+                },
+                (error) => {
+                    console.error('Error updating task:', error);
+                }
+            );
+        } else {
+            //add task
+            const newTask: any = {
+                taskId: null,
+                title: this.paramsTask.title,
+                done: this.paramsTask.done
+            };
+            this.taskService.newTask(this.currentTicket.ticketId, newTask).subscribe(
+                (response) => {
+                    console.log('task added successfully:', response);
+                    this.TasksList.push(response);
+                    const ticket:any = this.sectionList.find((section: any) => section.sectionId === this.currentSection.sectionId)
+                    ?.tickets.find((ticket:any) => ticket.ticketId === this.paramsTicket.ticketId);
+                    
+                    ticket.progress = this.calculateProgress(this.TasksList);
+                },
+                (error) => {
+                    console.error('Error adding task:', error);
+                }
+            );
+        }
+
+        this.showMessage('task has been saved successfully.');
         this.isAddTaskModal.close();
     }
+
 
     deleteConfirmModal(ticket: any = null) {
         setTimeout(() => {
@@ -319,16 +370,39 @@ export class BoardDetailsComponent implements OnInit {
             this.isDeleteModal.open();
         }, 10);
     }
-
+    deleteTaskConfirmModal(task: any = null) {
+        setTimeout(() => {
+            this.taskToDelete = task;
+            this.isDeleteTaskModal.open();
+        }, 10);
+    }
     deleteTicket() {
         this.ticketService.deleteTicket(this.ticketToDelete.ticketId).subscribe({
             next: () => {
-                this.getBoardById();
+                const sectionToUpdate:any = this.sectionList.find((section: any) => section.sectionId === this.currentSection.sectionId);
+                const updatedTickets:Ticket[] = sectionToUpdate.tickets.filter((ticket: any) => ticket.ticketId !== this.ticketToDelete.ticketId);
+                sectionToUpdate.tickets = updatedTickets;
                 this.showMessage('Ticket has been deleted successfully.');
                 this.isDeleteModal.close();
             },
             error: (err) => {
                 console.error('Error deleting Ticket:', err);
+            },
+        });
+    }
+    deleteTask() {
+        this.taskService.deleteTask(this.taskToDelete.taskId).subscribe({
+            next: () => {
+                this.TasksList=this.TasksList.filter((task:Task) => task.taskId !== this.taskToDelete.taskId);
+                const ticket:any = this.sectionList.find((section: any) => section.sectionId === this.currentSection.sectionId)
+                ?.tickets.find((ticket:any) => ticket.ticketId === this.paramsTicket.ticketId);
+                
+                ticket.progress = this.calculateProgress(this.TasksList);
+                this.showMessage('Task has been deleted successfully.');
+                this.isDeleteTaskModal.close();
+            },
+            error: (err) => {
+                console.error('Error deleting Task:', err);
             },
         });
     }
@@ -348,13 +422,28 @@ export class BoardDetailsComponent implements OnInit {
         });
     }
     filteredTasks: any = [];
-    taskComplete(task: any = null) {
+    calculateProgress(tasks:Task[]){
+        if (tasks.length === 0) {
+            return 0;
+        }
+        const doneTasksCount = tasks.filter(task => task.done).length;
+        const progressPercentage = (doneTasksCount / tasks.length) * 100;
+        return progressPercentage;
+
+    }
+    taskComplete(task: Task) {
         if (task) {
             task.done = !task.done;
             this.taskService.updateTask(task.taskId, task).subscribe(
                 (response) => {
                     console.log('task updated successfully:', response);
-                    this.getBoardById();
+                    let EditedTask:any = this.TasksList.find((task1:Task) => task1.taskId === task.taskId);
+                    EditedTask.done = task.done;
+                    const ticket:any = this.sectionList.find((section: any) => section.sectionId === this.currentSection.sectionId)
+                    ?.tickets.find((ticket:any) => ticket.ticketId === this.paramsTicket.ticketId);
+                    
+                    ticket.progress = this.calculateProgress(this.TasksList);
+
                 },
                 (error) => {
                     console.error('Error updating task:', error);
@@ -387,6 +476,13 @@ export class BoardDetailsComponent implements OnInit {
 
     onDragOver(event: any){
         event.preventDefault();
+    }
+
+    setDiscriptionText(event: any) {
+        this.paramsTicket.description = event.text;
+        this.paramsTicket.descriptionContent = event.html;
+        console.log(this.paramsTicket);
+        
     }
 
 

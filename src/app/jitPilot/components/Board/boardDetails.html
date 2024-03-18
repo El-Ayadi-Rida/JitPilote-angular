@@ -1,14 +1,42 @@
-<div>
-    <ul class="flex space-x-2 rtl:space-x-reverse">
+<div class="mb-5">
+    <ol class="flex flex-wrap items-center gap-y-4 font-semibold text-gray-500 dark:text-white-dark">
         <li>
-            <a [routerLink]="['/jitPilot/board', workspaceId, 'boards']" class="text-primary hover:underline">Boards</a>
+            <a
+                [routerLink]="['/']"
+                class="flex items-center justify-center rounded-md border border-gray-500/20 p-2.5 shadow hover:text-gray-500/70 dark:border-0 dark:bg-[#191e3a] dark:hover:text-white-dark/70"
+            >
+                <icon-home />
+            </a>
         </li>
-        <li class="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
-            <span>{{boardName}}</span>
+        <li
+            class="flex items-center before:relative before:-top-0.5 before:mx-4 before:inline-block before:h-1 before:w-1 before:rounded-full before:bg-primary"
+        >
+            <a
+                [routerLink]="['/jitPilot/board', workspaceId, 'boards']"
+                class="flex items-center justify-center rounded-md border border-gray-500/20 p-2.5 text-primary shadow dark:border-0 dark:bg-[#191e3a]"
+            >
+                <icon-box class="shrink-0 ltr:mr-2 rtl:ml-2" />
+
+                Boards
+            </a>
         </li>
-    </ul>
+        <li
+            class="flex items-center before:relative before:-top-0.5 before:mx-4 before:inline-block before:h-1 before:w-1 before:rounded-full before:bg-primary"
+        >
+            <a
+                class="flex items-center justify-center rounded-md border border-gray-500/20 p-2.5 shadow hover:text-gray-500/70 dark:border-0 dark:bg-[#191e3a] dark:hover:text-white-dark/70"
+                
+            >
+                <icon-cpu-bolt class="ltr:mr-2 rtl:ml-2" />
+
+                {{boardName}}
+            </a>
+        </li>
+    </ol>
+</div>
+<div>
     <div class="pt-3">
-        <button type="button" class="btn bg-lime-800 hover:bg-lime-700 text-white ltr:ml-4 rtl:mr-4 flex" (click)="addEditProject()">
+        <button type="button" class="btn bg-lime-800 hover:bg-lime-700 text-white ltr:ml-4 rtl:mr-4 flex" (click)="addEditSection()">
             <icon-plus class="h-5 w-5 ltr:mr-3 rtl:ml-3" />
             Add Section
         </button>
@@ -27,7 +55,7 @@
                             <h4 class="text-base font-semibold">{{ section.sectionTitle }}</h4>
 
                             <div class="flex items-center">
-                                <button type="button" class="hover:text-primary ltr:mr-2 rtl:ml-2" (click)="addEditTicket(null,section.sectionId)">
+                                <button type="button" class="hover:text-primary ltr:mr-2 rtl:ml-2" (click)="addEditTicket(null,section)">
                                     <icon-plus-circle />
                                 </button>
                                 <div hlMenu class="dropdown">
@@ -36,7 +64,7 @@
                                     </button>
                                     <ul *hlMenuItems @toggleAnimation class="ltr:right-0 rtl:left-0">
                                         <li>
-                                            <a href="javascript:;" *hlMenuItem="let menuItem" (click)="addEditProject(section)">Edit</a>
+                                            <a href="javascript:;" *hlMenuItem="let menuItem" (click)="addEditSection(section)">Edit</a>
                                         </li>
                                         <li><a href="javascript:;" *hlMenuItem="let menuItem" (click)="deleteSectionConfirm(section)">Delete</a></li>
                                         <li><a href="javascript:;" *hlMenuItem="let menuItem" (click)="clearConfirmModal(section)">Clear All</a></li>                                    </ul>
@@ -60,9 +88,9 @@
                                         <img src="/assets/images/carousel1.jpeg" alt="images" class="h-32 w-full rounded-md object-cover" />
                                     </ng-container> -->
                                     <div class="text-base font-medium">{{ ticket.title }}</div>
-                                    <p class="break-all">{{ ticket.description }}</p>
+                                    <p class="line-clamp-1 min-w-[250px] overflow-hidden text-white-dark">{{ ticket.description.toString() }}</p>
                                     <div class="flex flex-wrap items-center gap-2"
-                                    (click)="ViewTicketModal(ticket)"
+                                    (click)="ViewTicketModal(ticket,section)"
                                     >
                                         <ng-container *ngIf="ticket.priority !== 'LOW'; else elseBlock">
                                                 <div class="btn btn-outline-primary flex px-2 py-1">
@@ -86,7 +114,7 @@
                                             <span>{{ ticket.endDate | date:'yyyy-MM-dd' }}</span>
                                         </div>
                                         <div class="flex items-center">
-                                            <button type="button" class="hover:text-info" (click)="addEditTicket(ticket,section.sectionId)">
+                                            <button type="button" class="hover:text-info" (click)="addEditTicket(ticket,section)">
                                                 <icon-edit class="ltr:mr-3 rtl:ml-3" />
                                             </button>
                                             <button type="button" class="hover:text-danger" (click)="deleteConfirmModal(ticket)">
@@ -94,12 +122,22 @@
                                             </button>
                                         </div>
                                     </div>
+                                    <div class="space-y-2">
+                                        <h3 class="text-base" [ngClass]="{'text-success': ticket.progress >= 80, 'text-warning': ticket.progress >= 50 && ticket.progress < 80, 'text-danger': ticket.progress < 50}">
+                                            Ticket Progress ({{ticket.progress.toFixed(2)}}%)
+                                        </h3>
+                                        <div class="flex h-2.5 w-full rounded-full bg-[#ebedf2] dark:bg-dark/40">
+                                            <div class="h-2.5 rounded-full rounded-bl-full text-center text-xs text-white" [style.width.%]="ticket.progress.toFixed(2)"
+                                            [ngClass]="{'bg-success': ticket.progress >= 80, 'bg-warning': ticket.progress >= 50 && ticket.progress < 80, 'bg-danger': ticket.progress < 50}"
+                                            ></div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
                         <div class="pt-3">
-                            <button type="button" class="btn outline outline-1 outline-lime-800 text-lime-600 hover:bg-lime-700 hover:text-white focus:ring-4 focus:ring-lime-300 focus:outline-none ltr:ml-4 rtl:mr-4 mx-auto" (click)="addEditTicket(null , section.sectionId)">
+                            <button type="button" class="btn outline outline-1 outline-lime-800 text-lime-600 hover:bg-lime-700 hover:text-white focus:ring-4 focus:ring-lime-300 focus:outline-none ltr:ml-4 rtl:mr-4 mx-auto" (click)="addEditTicket(null , section)">
                                 <icon-plus />
                                 Add Ticket
                             </button>
@@ -111,7 +149,7 @@
     </div>
 
     <!-- add project modal -->
-    <modal #isAddProjectModal class="no-footer">
+    <modal #isAddSectionModal class="no-footer">
         <ng-template #modalHeader>
             <div class="!font-medium">{{ params.sectionId ? 'Edit Section' : 'Add Section' }}</div>
         </ng-template>
@@ -125,7 +163,7 @@
                 </div>
 
                 <div class="mt-8 flex items-center justify-end">
-                    <button type="button" class="btn btn-outline-danger" (click)="isAddProjectModal.close()">Cancel</button>
+                    <button type="button" class="btn btn-outline-danger" (click)="isAddSectionModal.close()">Cancel</button>
                     <button type="submit" class="btn btn-primary ltr:ml-4 rtl:mr-4">{{ params.sectionId ? 'Update' : 'Add' }}</button>
                 </div>
             </form>
@@ -133,7 +171,7 @@
     </modal>
 
     <!-- add task modal -->
-    <modal #isAddTaskModal class="no-footer">
+    <modal #isAddTicketModal class="no-footer">
         <ng-template #modalHeader>
             <div class="!font-medium">{{ paramsTicket.ticketId ? 'Edit Ticket' : 'Add Ticket' }}</div>
         </ng-template>
@@ -162,7 +200,7 @@
                 </div>
 
                 <div class="mt-8 flex items-center justify-end">
-                    <button type="button" class="btn btn-outline-danger" (click)="isAddTaskModal.close()">Cancel</button>
+                    <button type="button" class="btn btn-outline-danger" (click)="isAddTicketModal.close()">Cancel</button>
                     <button type="submit" class="btn btn-primary ltr:ml-4 rtl:mr-4">{{ paramsTicket.ticketId ? 'Update' : 'Add' }}</button>
                 </div>
             </form>
@@ -243,19 +281,35 @@
                         </div>
                         <div>
                             <label for="taskdesc">Description</label>
-                            <textarea
+                            <!-- <textarea
                                 id="taskdesc"
                                 [(ngModel)]="paramsTicket.description"
                                 name="description"
                                 class="form-textarea min-h-[130px]"
                                 placeholder="Enter Description"
-                            ></textarea>
+                            ></textarea> -->
+                            <quill-editor
+                            #quillEditorObj
+                            [modules]="editorOptions"
+                            id="taskdesc"
+                            [(ngModel)]="paramsTicket.descriptionContent"
+                            name="description"
+                            class="w-full"
+                            placeholder="Enter Description"
+                            (onContentChanged)="setDiscriptionText($event)"
+                        ></quill-editor>
                         </div>
-                        <div >
-                            <label for="tasks">Tasks</label>
+                        <div>
+                            <div class="flex items-center">
+                                <label for="tasks">Tasks</label>
+                                <button type="button" class="hover:text-primary ltr:mr-2 rtl:ml-2 ml-4 mr-4" (click)="addEditTask(null,paramsTicket)">
+                                    <icon-plus-circle />
+                                </button>
+                            </div>
+                            
                             <table class="table-hover">
                                 <tbody>
-                                    <ng-container *ngFor="let task of tasks">
+                                    <ng-container *ngFor="let task of TasksList">
                                         <tr class="group cursor-pointer" [ngClass]="{ 'bg-white-light/30 dark:bg-[#1a2941]': task.done }">
                                             <td class="w-1">
                                                 <input
@@ -277,12 +331,37 @@
                                                     </div>
                                                 </div>
                                             </td>
+                                            <td class="w-1">
+                                                <div class="flex w-max items-center justify-between">
+                                                    <div hlMenu class="dropdown">
+                                                        <a hlMenuButton href="javascript:;">
+                                                            <icon-horizontal-dots class="rotate-90 opacity-70" />
+                                                        </a>
+                                                        <ul *hlMenuItems @toggleAnimation class="w-max ltr:right-0 rtl:left-0">
+                                                            <ng-container >
+                                                                <li>
+                                                                    <a href="javascript:;" *hlMenuItem="let menuItem" (click)="addEditTask(task,paramsTicket)">
+                                                                        <icon-pencil-paper class="w-4.5 h-4.5 ltr:mr-2 rtl:ml-2 shrink-0" />
+    
+                                                                        Edit
+                                                                    </a>
+                                                                </li>
+                                                                <li>
+                                                                    <a href="javascript:;" *hlMenuItem="let menuItem" (click)="deleteTaskConfirmModal(task)">
+                                                                        <icon-trash-lines class="ltr:mr-2 rtl:ml-2 shrink-0" />
+                                                                        Delete
+                                                                    </a>
+                                                                </li>
+                                                            </ng-container>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </td>
                                         </tr>
                                     </ng-container>
                                 </tbody>
                             </table>
                         </div>
-
                     </div>
     
                     <div class="mt-8 flex items-center justify-end">
@@ -292,5 +371,46 @@
                 </form>
             </ng-template>
         </modal>
+        <!-- add task modal -->
+        <modal #isAddTaskModal class="no-footer">
+            <ng-template #modalHeader>
+                <div class="!font-medium">{{ paramsTask.taskId ? 'Edit Task' : 'Add Task' }}</div>
+            </ng-template>
+            <ng-template #modalBody>
+                <form (ngSubmit)="saveTask()" class="text-sm">
+                    <div class="grid gap-5">
+
+                                    <input id="taskTitle" [(ngModel)]="paramsTask.title" name="title" type="text" class="form-input" placeholder="Enter Name" />
+
+                    </div>
+    
+                    <div class="mt-8 flex items-center justify-end">
+                        <button type="button" class="btn btn-outline-danger" (click)="isAddTaskModal.close()">Cancel</button>
+                        <button type="submit" class="btn btn-primary ltr:ml-4 rtl:mr-4">{{ paramsTask.taskId ? 'Update' : 'Add' }}</button>
+                    </div>
+                </form>
+            </ng-template>
+        </modal>
+            <!-- delete task modal -->
+    <modal #isDeleteTaskModal class="no-footer">
+        <ng-template #modalHeader>
+            <div class="!font-medium">Delete Task</div>
+        </ng-template>
+        <ng-template #modalBody>
+            <div class="text-center">
+                <div class="mx-auto w-fit rounded-full bg-danger p-4 text-white ring-4 ring-danger/30">
+                    <icon-trash-lines />
+                </div>
+                <div class="mx-auto mt-5 text-base sm:w-3/4">Are you sure you want to delete Task?</div>
+
+                <div class="mt-8 flex items-center justify-center">
+                    <button type="button" class="btn btn-outline-danger" (click)="isDeleteTaskModal.close()">Cancel</button>
+                    <button type="button" class="btn btn-primary ltr:ml-4 rtl:mr-4" (click)="deleteTask()">Delete</button>
+                </div>
+            </div>
+        </ng-template>
+    </modal>
+
+
 </div>
 

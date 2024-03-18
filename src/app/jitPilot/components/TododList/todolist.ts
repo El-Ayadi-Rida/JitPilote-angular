@@ -31,7 +31,7 @@ export class TodolistComponent {
     selectedTab = '';
     isShowTaskMenu = false;
 
-    params!: FormGroup;
+    params!: FormGroup; 
     allTasks = [
         {
             id: 1,

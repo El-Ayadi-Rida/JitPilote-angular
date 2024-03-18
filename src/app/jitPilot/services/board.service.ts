@@ -32,4 +32,7 @@ getBoardById(boardId: number):Observable<Board>{
 getBoardByWorkspaceId(workspacedId: number):Observable<Board[]>{
   return this.http.get<Board[]>(`${environment.URL_API}/boards/w/${workspacedId}`);
 }
+getBoardsByWorkspaceAndUser(workspacedId: number,userId: number):Observable<Board[]>{
+  return this.http.get<Board[]>(`${environment.URL_API}/boards/w/${workspacedId}/u/${userId}`);
+}
 }

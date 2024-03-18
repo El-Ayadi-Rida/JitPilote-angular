@@ -101,17 +101,19 @@
                             <icon-minus class="hidden h-5 w-4 flex-none" />
                             <span>{{ ('Your Boards' | translate) || '&nbsp;' }}</span>
                         </h2>
-                        <li class="nav-item">
-                            <a routerLink="/jitPilot/scrumboard/1" class="group" routerLinkActive="active" (click)="toggleMobileMenu()">
-                                <div class="flex items-center">
-                                    <icon-menu-scrumboard class="shrink-0 group-hover:!text-primary" />
-    
-                                    <span class="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark"
-                                        >{{ 'scrumboard' | translate }}</span
-                                    >
-                                </div>
-                            </a>
-                        </li>
+                        <ng-container *ngFor="let userBoard of userBoardList" key="userBoard.boardId">
+                            <li class="nav-item">
+                                <a  [routerLink]="['/jitPilot/scrumboard/', userBoard.boardId]" class="group" routerLinkActive="active" (click)="toggleMobileMenu()">
+                                    <div class="flex items-center">
+                                        <icon-menu-scrumboard class="shrink-0 group-hover:!text-primary" />
+        
+                                        <span class="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark"
+                                            >{{ userBoard.boardName | translate }}</span
+                                        >
+                                    </div>
+                                </a>
+                            </li>
+                        </ng-container>
                     </ul>                  </ng-template>
             </ng-scrollbar>
         </div>

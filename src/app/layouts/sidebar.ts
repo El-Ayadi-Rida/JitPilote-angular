@@ -3,7 +3,9 @@ import { Component, Input } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
+import { Board } from '../jitPilot/models/board';
 import { workspace } from '../jitPilot/models/workspace';
+import { BoardService } from '../jitPilot/services/board.service';
 import { WorkspaceService } from '../jitPilot/services/workspace.service';
 import { AppService } from '../service/app.service';
 import { slideDownUp } from '../shared/animations';
@@ -22,12 +24,14 @@ export class SidebarComponent {
     workspace!: workspace;
     activeDropdown: string[] = [];
     parentDropdown: string = '';
+    userBoardList!:Board[];
     constructor(
         public translate: TranslateService, 
         public storeData: Store<any>, 
         public router: Router,
         private route: ActivatedRoute,
         private workspaceService:WorkspaceService,
+        private boardService:BoardService,
         private appService:AppService
         ) {
         this.initStore();
@@ -55,6 +59,9 @@ export class SidebarComponent {
             console.log(this.workspace);
 
 
+            this.getBoardsByWorkspaceAndUser();
+
+
         // this.appService.currentWorspace.subscribe(workspacef =>
         //     {
         //         this.workspace = workspacef
@@ -72,6 +79,16 @@ export class SidebarComponent {
         this.workspaceService.getWorkspaceById(this.workspaceId).subscribe((data) =>{
             this.workspace = data;
         });
+    }
+    getBoardsByWorkspaceAndUser(){
+        this.boardService.getBoardsByWorkspaceAndUser(this.workspace.workspaceId, 1).subscribe(
+            (response) => {
+                this.userBoardList = response;
+            },
+            (error) => {
+                console.error('Error fetching task:', error);
+            }
+        );
     }
     setActiveDropdown() {
         const selector = document.querySelector('.sidebar ul a[routerLink="' + window.location.pathname + '"]');
@@ -94,6 +111,9 @@ export class SidebarComponent {
         if (window.innerWidth < 1024) {
             this.storeData.dispatch({ type: 'toggleSidebar' });
         }
+    }
+    viewBoard(boardId:number){
+        this.router.navigate([`/jitPilot/${boardId}`]);
     }
 
     toggleAccordion(name: string, parent?: string) {
