@@ -1,4 +1,15 @@
 <div>
+    <ul class="flex space-x-2 rtl:space-x-reverse">
+        <li>
+            <a routerLink="/" class="text-primary hover:underline">Workspaces</a>
+        </li>
+        <li class="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
+            <span *ngIf="workspace else noWorkspace">{{workspace.name}}</span>
+            <ng-template #noWorkspace>
+            <span>loading ....</span>
+            </ng-template>
+        </li>
+    </ul>
     <div class="relative flex h-full gap-5 sm:h-[calc(100vh_-_150px)]">
         <div
             class="absolute z-10 hidden h-full w-full rounded-md bg-black/60"
@@ -14,7 +25,7 @@
                     <div class="shrink-0">
                         <icon-notes />
                     </div>
-                    <h3 class="text-lg font-semibold ltr:ml-3 rtl:mr-3">Notes</h3>
+                    <h3 class="text-lg font-semibold ltr:ml-3 rtl:mr-3">Boards</h3>
                 </div>
                 <div class="my-4 h-px w-full border-b border-[#e0e6ed] dark:border-[#1b2e4b]"></div>
                 <ng-scrollbar class="relative h-full grow ltr:pr-3.5 rtl:pl-3.5" appearance="compact">
@@ -28,7 +39,7 @@
                             <div class="flex items-center">
                                 <icon-notes-edit class="shrink-0" />
 
-                                <div class="ltr:ml-3 rtl:mr-3">All Notes</div>
+                                <div class="ltr:ml-3 rtl:mr-3">All Boards</div>
                             </div>
                         </button>
                         <button
@@ -43,53 +54,33 @@
                             </div>
                         </button>
                         <div class="h-px w-full border-b border-[#e0e6ed] dark:border-[#1b2e4b]"></div>
-                        <div class="px-1 py-3 text-white-dark">Tags</div>
-                        <button
-                            type="button"
-                            class="flex h-10 w-full items-center rounded-md p-1 font-medium text-primary duration-300 hover:bg-white-dark/10 ltr:hover:pl-3 rtl:hover:pr-3 dark:hover:bg-[#181F32]"
-                            [ngClass]="{'ltr:pl-3 rtl:pr-3 bg-gray-100 dark:bg-[#181F32]': selectedTab === 'personal' }"
-                            (click)="tabChanged('personal')"
-                        >
-                            <icon-square-rotated class="shrink-0 fill-primary" />
-                            <div class="ltr:ml-3 rtl:mr-3">Personal</div>
-                        </button>
-
-                        <button
-                            type="button"
-                            class="flex h-10 w-full items-center rounded-md p-1 font-medium text-warning duration-300 hover:bg-white-dark/10 ltr:hover:pl-3 rtl:hover:pr-3 dark:hover:bg-[#181F32]"
-                            [ngClass]="{ 'ltr:pl-3 rtl:pr-3 bg-gray-100 dark:bg-[#181F32]': selectedTab === 'work' }"
-                            (click)="tabChanged('work')"
-                        >
-                            <icon-square-rotated class="shrink-0 fill-warning" />
-                            <div class="ltr:ml-3 rtl:mr-3">Work</div>
-                        </button>
-
+                        <div class="px-1 py-3 text-white-dark">access Level</div>
                         <button
                             type="button"
                             class="flex h-10 w-full items-center rounded-md p-1 font-medium text-info duration-300 hover:bg-white-dark/10 ltr:hover:pl-3 rtl:hover:pr-3 dark:hover:bg-[#181F32]"
-                            [ngClass]="{ 'ltr:pl-3 rtl:pr-3 bg-gray-100 dark:bg-[#181F32]': selectedTab === 'social' }"
-                            (click)="tabChanged('social')"
+                            [ngClass]="{ 'ltr:pl-3 rtl:pr-3 bg-gray-100 dark:bg-[#181F32]': selectedTab === 'PUBLIC' }"
+                            (click)="tabChanged('PUBLIC')"
                         >
                             <icon-square-rotated class="shrink-0 fill-info" />
-                            <div class="ltr:ml-3 rtl:mr-3">Social</div>
+                            <div class="ltr:ml-3 rtl:mr-3">Public</div>
                         </button>
 
                         <button
                             type="button"
                             class="flex h-10 w-full items-center rounded-md p-1 font-medium text-danger duration-300 hover:bg-white-dark/10 ltr:hover:pl-3 rtl:hover:pr-3 dark:hover:bg-[#181F32]"
-                            [ngClass]="{ 'ltr:pl-3 rtl:pr-3 bg-gray-100 dark:bg-[#181F32]': selectedTab === 'important' }"
-                            (click)="tabChanged('important')"
+                            [ngClass]="{ 'ltr:pl-3 rtl:pr-3 bg-gray-100 dark:bg-[#181F32]': selectedTab === 'PRIVATE' }"
+                            (click)="tabChanged('PRIVATE')"
                         >
                             <icon-square-rotated class="shrink-0 fill-danger" />
-                            <div class="ltr:ml-3 rtl:mr-3">Important</div>
+                            <div class="ltr:ml-3 rtl:mr-3">Private</div>
                         </button>
                     </div>
                 </ng-scrollbar>
             </div>
             <div class="absolute bottom-0 w-full p-4 ltr:left-0 rtl:right-0">
-                <button class="btn btn-primary w-full" type="button" (click)="editNote()">
+                <button class="btn bg-lime-800 hover:bg-lime-700 text-white w-full" type="button" (click)="editBoard()">
                     <icon-plus class="h-5 w-5 shrink-0 ltr:mr-2 rtl:ml-2" />
-                    Add New Note
+                    Add New Board
                 </button>
             </div>
         </div>
@@ -100,44 +91,41 @@
                     <icon-menu />
                 </button>
             </div>
-            <ng-container *ngIf="!filterdNotesList.length">
+            <ng-container *ngIf="!filterdBoardsList.length">
                 <div class="flex h-full min-h-[400px] items-center justify-center text-lg font-semibold sm:min-h-[300px]">No data available</div>
             </ng-container>
-            <ng-container *ngIf="filterdNotesList.length">
+            <ng-container *ngIf="filterdBoardsList.length">
                 <div class="min-h-[400px] sm:min-h-[300px]">
                     <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
-                        <ng-container *ngFor="let note of filterdNotesList">
+                        <ng-container *ngFor="let board of filterdBoardsList">
                             <div
-                                class="panel pb-12"
-                                [ngClass]="{'bg-primary-light shadow-primary': note.tag === 'personal',
-                                        'bg-warning-light shadow-warning': note.tag === 'work',
-                                        'bg-info-light shadow-info': note.tag === 'social',
-                                        'bg-danger-light shadow-danger': note.tag === 'important',
-                                        'dark:shadow-dark': !note.tag}"
+                                class="panel pb-12 cursor-pointer"
+                                [ngClass]="{
+                                        'bg-info-light shadow-info': board.accessLevel === 'PUBLIC',
+                                        'bg-danger-light shadow-danger': board.accessLevel === 'PRIVATE',
+                                        'dark:shadow-dark': !board.accessLevel}"
+                                
                             >
-                                <div class="min-h-[142px]">
+                                <div class="min-h-[142px]" (click)="viewBoard(board)">
                                     <div class="flex justify-between">
                                         <div class="flex w-max items-center">
                                             <div class="flex-none">
-                                                <div *ngIf="note.thumb" class="rounded-full bg-gray-300 p-0.5 dark:bg-gray-700">
-                                                    <img class="h-8 w-8 rounded-full object-cover" [src]="'/assets/images/' + note.thumb" />
-                                                </div>
                                                 <div
-                                                    *ngIf="!note.thumb && note.user"
+                                                    *ngIf="board.boardName"
                                                     class="grid h-8 w-8 place-content-center rounded-full bg-gray-300 text-sm font-semibold dark:bg-gray-700"
                                                 >
-                                                    {{ note.user.charAt(0) + note.user.charAt(note.user.indexOf(' ') + 1) }}
+                                                    {{ board.boardName.charAt(0).toUpperCase() + board.boardName.charAt(board.boardName.indexOf(' ') + 1).toUpperCase() }}
                                                 </div>
                                                 <div
-                                                    *ngIf="!note.thumb && !note.user"
+                                                    *ngIf="!board.boardName && !board.boardName"
                                                     class="grid h-8 w-8 place-content-center rounded-full bg-gray-300 dark:bg-gray-700"
                                                 >
                                                     <icon-user class="h-4.5 w-4.5" />
                                                 </div>
                                             </div>
                                             <div class="ltr:ml-2 rtl:mr-2">
-                                                <div class="font-semibold">{{ note.user }}</div>
-                                                <div class="text-sx text-white-dark">{{ note.date }}</div>
+                                                <div class="font-semibold">{{ board.boardName }}</div>
+                                                <div class="text-sx text-white-dark">{{ board.startDate }}</div>
                                             </div>
                                         </div>
                                         <div hlMenu class="dropdown">
@@ -146,20 +134,20 @@
                                             </button>
                                             <ul *hlMenuItems @toggleAnimation class="text-sm font-medium ltr:right-0 rtl:left-0">
                                                 <li>
-                                                    <a href="javascript:;" class="w-full" *hlMenuItem="let menuItem" (click)="editNote(note)">
+                                                    <a href="javascript:;" class="w-full" *hlMenuItem="let menuItem" (click)="editBoard(board)">
                                                         <icon-pencil class="h-4 w-4 shrink-0 ltr:mr-3 rtl:ml-3" />
 
                                                         Edit
                                                     </a>
                                                 </li>
                                                 <li>
-                                                    <a href="javascript:;" class="w-full" *hlMenuItem="let menuItem" (click)="deleteNoteConfirm(note)">
+                                                    <a href="javascript:;" class="w-full" *hlMenuItem="let menuItem" (click)="deleteBoardConfirm(board)">
                                                         <icon-trash-lines class="h-4.5 w-4.5 shrink-0 ltr:mr-3 rtl:ml-3" />
                                                         Delete
                                                     </a>
                                                 </li>
                                                 <li>
-                                                    <a href="javascript:;" class="w-full" *hlMenuItem="let menuItem" (click)="viewNote(note)">
+                                                    <a href="javascript:;" class="w-full" *hlMenuItem="let menuItem" (click)="viewBoard(board)">
                                                         <icon-eye class="h-4.5 w-4.5 shrink-0 ltr:mr-3 rtl:ml-3" />
 
                                                         View
@@ -169,8 +157,8 @@
                                         </div>
                                     </div>
                                     <div>
-                                        <h4 class="mt-4 font-semibold">{{ note.title }}</h4>
-                                        <p class="mt-2 text-white-dark">{{ note.description }}</p>
+                                        <h4 class="mt-4 font-semibold">{{ board.boardName }}</h4>
+                                        <p class="mt-2 text-white-dark">{{ board.description }}</p>
                                     </div>
                                 </div>
                                 <div class="absolute bottom-5 left-0 w-full px-5">
@@ -180,48 +168,34 @@
                                                 hlMenuButton
                                                 type="button"
                                                 [ngClass]="{
-                                                        'text-primary': note.tag === 'personal',
-                                                        'text-warning': note.tag === 'work',
-                                                        'text-info': note.tag === 'social',
-                                                        'text-danger': note.tag === 'important'}"
+                                                        'text-info': board.accessLevel === 'PUBLIC',
+                                                        'text-danger': board.accessLevel === 'PRIVATE'}"
                                             >
                                                 <icon-square-rotated
-                                                    [class]="{'fill-primary': note.tag === 'personal','fill-warning': note.tag === 'work','fill-info': note.tag === 'social','fill-danger': note.tag === 'important'}"
+                                                    [class]="{'fill-info': board.accessLevel === 'PUBLIC','fill-danger': board.accessLevel === 'PRIVATE'}"
                                                 />
                                             </button>
                                             <ul *hlMenuItems @toggleAnimation class="ltr:left-0 rtl:right-0">
                                                 <li>
-                                                    <a href="javascript:;" *hlMenuItem="let menuItem" (click)="setTag(note, 'personal')">
-                                                        <icon-square-rotated class="fill-primary text-primary ltr:mr-2 rtl:ml-2" />
-                                                        Personal
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <a href="javascript:;" *hlMenuItem="let menuItem" (click)="setTag(note, 'work')">
-                                                        <icon-square-rotated class="fill-warning text-warning ltr:mr-2 rtl:ml-2" />
-                                                        Work
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <a href="javascript:;" *hlMenuItem="let menuItem" (click)="setTag(note, 'social')">
+                                                    <a href="javascript:;" *hlMenuItem="let menuItem" (click)="setAccessLevel(board, 'PUBLIC')">
                                                         <icon-square-rotated class="fill-info text-info ltr:mr-2 rtl:ml-2" />
-                                                        Social
+                                                        Public
                                                     </a>
                                                 </li>
                                                 <li>
-                                                    <a href="javascript:;" *hlMenuItem="let menuItem" (click)="setTag(note, 'important')">
+                                                    <a href="javascript:;" *hlMenuItem="let menuItem" (click)="setAccessLevel(board, 'PRIVATE')">
                                                         <icon-square-rotated class="fill-danger text-danger ltr:mr-2 rtl:ml-2" />
-                                                        Important
+                                                        Private
                                                     </a>
                                                 </li>
                                             </ul>
                                         </div>
                                         <div class="flex items-center">
-                                            <button type="button" class="text-danger" (click)="deleteNoteConfirm(note)">
+                                            <button type="button" class="text-danger" (click)="deleteBoardConfirm(board)">
                                                 <icon-trash-lines />
                                             </button>
-                                            <button type="button" class="group text-warning ltr:ml-2 rtl:mr-2" (click)="setFav(note)">
-                                                <icon-star [class]="'h-4.5 w-4.5 group-hover:fill-warning ' + [note.isFav ? 'fill-warning' : ''  ]" />
+                                            <button type="button" class="group text-warning ltr:ml-2 rtl:mr-2" (click)="setFav(board)">
+                                                <icon-star [class]="'h-4.5 w-4.5 group-hover:fill-warning ' + [board.fav ? 'fill-warning' : ''  ]" />
                                             </button>
                                         </div>
                                     </div>
@@ -232,47 +206,28 @@
                 </div>
             </ng-container>
 
-            <modal #isAddNoteModal class="no-footer">
+            <modal #isAddBoardModal class="no-footer">
                 <ng-template #modalHeader>
-                    <div class="!font-medium">{{ params.value.id ? 'Edit Note' : 'Add Note' }}</div>
+                    <div class="!font-medium">{{ params.value.boardId ? 'Edit Board' : 'Add Board' }}</div>
                 </ng-template>
                 <ng-template #modalBody>
-                    <form [formGroup]="params" (submit)="saveNote()" class="text-sm">
+                    <form [formGroup]="params" (submit)="saveBoard()" class="text-sm">
                         <div class="mb-5">
-                            <label for="title">Title</label>
-                            <input id="title" type="text" placeholder="Enter Title" class="form-input" formControlName="title" />
+                            <label for="boardName">Board Title</label>
+                            <input id="boardName" type="text" placeholder="Enter board Name" class="form-input" formControlName="boardName" />
                         </div>
                         <div class="mb-5">
-                            <label for="name">User Name</label>
-                            <select id="name" class="form-select" formControlName="user">
-                                <option value="">Select User</option>
-                                <option value="Max Smith">Max Smith</option>
-                                <option value="John Doe">John Doe</option>
-                                <option value="Kia Jain">Kia Jain</option>
-                                <option value="Karena Courtliff">Karena Courtliff</option>
-                                <option value="Vladamir Koschek">Vladamir Koschek</option>
-                                <option value="Robert Garcia">Robert Garcia</option>
-                                <option value="Marie Hamilton">Marie Hamilton</option>
-                                <option value="Megan Meyers">Megan Meyers</option>
-                                <option value="Angela Hull">Angela Hull</option>
-                                <option value="Karen Wolf">Karen Wolf</option>
-                                <option value="Jasmine Barnes">Jasmine Barnes</option>
-                                <option value="Thomas Cox">Thomas Cox</option>
-                                <option value="Marcus Jones">Marcus Jones</option>
-                                <option value="Matthew Gray">Matthew Gray</option>
-                                <option value="Chad Davis">Chad Davis</option>
-                                <option value="Linda Drake">Linda Drake</option>
-                                <option value="Kathleen Flores">Kathleen Flores</option>
+                            <label for="name">Board Template</label>
+                            <select id="name" class="form-select" formControlName="templateType">
+                                <option value="SCRUM" [defaultSelected]="">SCRUM</option>
+                                <option value="KANBAN">KANBAN</option>
                             </select>
                         </div>
                         <div class="mb-5">
-                            <label for="tag">Tag</label>
-                            <select id="tag" class="form-select" formControlName="tag">
-                                <option value="">None</option>
-                                <option value="personal">Personal</option>
-                                <option value="work">Work</option>
-                                <option value="social">Social</option>
-                                <option value="important">Important</option>
+                            <label for="accessLevel">Access Level</label>
+                            <select id="accessLevel" class="form-select" formControlName="accessLevel">
+                                <option value="PUBLIC">Public</option>
+                                <option value="PRIVATE">Private</option>
                             </select>
                         </div>
                         <div class="mb-5">
@@ -286,57 +241,56 @@
                             ></textarea>
                         </div>
                         <div class="mt-8 flex items-center justify-end">
-                            <button type="button" class="btn btn-outline-danger gap-2" (click)="isAddNoteModal.close()">Cancel</button>
-                            <button type="submit" class="btn btn-primary ltr:ml-4 rtl:mr-4">{{ params.value.id ? 'Update Note' : 'Add Note' }}</button>
+                            <button type="button" class="btn btn-outline-danger gap-2" (click)="isAddBoardModal.close()">Cancel</button>
+                            <button type="submit" class="btn bg-lime-800 hover:bg-lime-700 text-white ltr:ml-4 rtl:mr-4">{{ params.value.boardId ? 'Update Note' : 'Add Board' }}</button>
                         </div>
                     </form>
                 </ng-template>
             </modal>
 
-            <modal #isDeleteNoteModal class="no-footer">
+            <modal #isDeleteBoardModal class="no-footer">
                 <ng-template #modalHeader>
-                    <div class="!font-medium">Delete Notes</div>
+                    <div class="!font-medium">Delete Board</div>
                 </ng-template>
                 <ng-template #modalBody>
                     <div class="text-center text-sm">
                         <div class="mx-auto w-fit rounded-full bg-danger p-4 text-white ring-4 ring-danger/30">
                             <icon-trash-lines class="mx-auto h-7 w-7" />
                         </div>
-                        <div class="mx-auto mt-5 sm:w-3/4">Are you sure you want to delete Notes?</div>
+                        <div class="mx-auto mt-5 sm:w-3/4">Are you sure you want to delete Board?</div>
 
                         <div class="mt-8 flex items-center justify-center">
-                            <button type="button" class="btn btn-outline-danger" (click)="isDeleteNoteModal.close()">Cancel</button>
-                            <button type="button" class="btn btn-primary ltr:ml-4 rtl:mr-4" (click)="deleteNote()">Delete</button>
+                            <button type="button" class="btn btn-outline-danger" (click)="isDeleteBoardModal.close()">Cancel</button>
+                            <button type="button" class="btn btn-primary ltr:ml-4 rtl:mr-4" (click)="deleteBoard()">Delete</button>
                         </div>
                     </div>
                 </ng-template>
             </modal>
 
-            <modal #isViewNoteModal class="no-footer">
+            <modal #isViewBoardModal class="no-footer">
                 <ng-template #modalHeader>
                     <div class="flex flex-wrap items-center gap-3 !font-medium">
-                        <div>{{ selectedNote.title }}</div>
+                        <div>{{ selectedBoard.boardName }}</div>
                         <button
-                            *ngIf="selectedNote.tag"
+                            *ngIf="selectedBoard.accessLevel"
                             type="button"
                             class="badge badge-outline-primary rounded-3xl capitalize"
-                            [ngClass]="{'shadow-primary': selectedNote.tag === 'personal',
-                                                    'shadow-warning': selectedNote.tag === 'work',
-                                                    'shadow-info': selectedNote.tag === 'social',
-                                                    'shadow-danger': selectedNote.tag === 'important'}"
+                            [ngClass]="{
+                                                    'shadow-info': selectedBoard.accessLevel === 'PUBLIC',
+                                                    'shadow-danger': selectedBoard.accessLevel === 'PRIVATE'}"
                         >
-                            {{ selectedNote.tag }}
+                            {{ selectedBoard.accessLevel }}
                         </button>
-                        <button *ngIf="selectedNote.isFav" type="button" class="text-warning">
+                        <button *ngIf="selectedBoard.fav" type="button" class="text-warning">
                             <icon-star class="fill-warning" />
                         </button>
                     </div>
                 </ng-template>
                 <ng-template #modalBody>
-                    <div class="text-base">{{ selectedNote.description }}</div>
+                    <div class="text-base">{{ selectedBoard.description }}</div>
 
                     <div class="mt-8 ltr:text-right rtl:text-left">
-                        <button type="button" class="btn btn-outline-danger" (click)="isViewNoteModal.close()">Close</button>
+                        <button type="button" class="btn btn-outline-danger" (click)="isViewBoardModal.close()">Close</button>
                     </div>
                 </ng-template>
             </modal>

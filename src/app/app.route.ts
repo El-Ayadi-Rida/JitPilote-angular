@@ -1,7 +1,6 @@
 import { Routes } from '@angular/router';
 
 // dashboard
-import { IndexComponent } from './index';
 
 // layouts
 
@@ -9,6 +8,7 @@ import { IndexComponent } from './index';
 // pages
 import { AuthLayout } from './layouts/auth-layout';
 import { AppLayout } from './layouts/app-layout';
+import { WorkspaceComponent } from './jitPilot/components/workspace/workspace.component';
 
 export const routes: Routes = [
     {
@@ -16,7 +16,7 @@ export const routes: Routes = [
         component: AppLayout,
         children: [
             // dashboard
-            { path: '', component: IndexComponent, title: 'Sales Admin | VRISTO - Multipurpose Tailwind Dashboard Template' },
+            { path: '', component: WorkspaceComponent, title: 'JITECHPILOT - PROJECT MANAGER' },
 
 
             //apps

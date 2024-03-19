@@ -1,7 +1,20 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import Swal from 'sweetalert2';
 import { animate, style, transition, trigger } from '@angular/animations';
 import { ModalComponent } from 'angular-custom-modal';
+import { ActivatedRoute } from '@angular/router';
+import { BoardService } from '../../services/board.service';
+import { FormBuilder } from '@angular/forms';
+import { Board } from '../../models/board';
+import { Section } from '../../models/section';
+import { SectionService } from '../../services/section.service';
+import { TicketPriority } from '../../models/ticket-priority';
+import { TicketStatus } from '../../models/ticket-status';
+import { Ticket } from '../../models/ticket';
+import { TicketService } from '../../services/ticket.service';
+import { retry } from 'rxjs';
+import { Task } from '../../models/task';
+import { TaskService } from '../../services/task.service';
 
 @Component({
     moduleId: module.id,
@@ -13,209 +26,385 @@ import { ModalComponent } from 'angular-custom-modal';
         ]),
     ],
 })
-export class BoardDetailsComponent {
-    constructor() {}
+export class BoardDetailsComponent implements OnInit {
+    constructor(
+        private route: ActivatedRoute,
+        public fb: FormBuilder,
+        private boardService: BoardService,
+        private sectionService: SectionService,
+        private ticketService: TicketService,
+        private taskService:TaskService
+    ) {}
+    ngOnInit(): void {
+        this.route.params.subscribe((params) => {
+            this.boardId = params['boardId'];
+        });
+        this.getBoardById();
+        this.workspaceId = JSON.parse(sessionStorage.getItem('workspaceItem')!).workspaceId;
+        console.log(this.workspaceId);
+    }
+    boardId: number = 0;
+    currentBoard!: Board;
+    boardName!: string;
+    sectionList!: Section[];
+    deletedSection!: Section;
+    workspaceId!: number;
+    currentSection!: Section;
+    ticketToDelete!: Ticket;
+    taskToDelete!: Task;
+    sectionToClear!: Section;
+    TasksList!:Task[];
+    progress!:string;
+    currentTicket!:Ticket
+
     params = {
-        id: null,
-        title: '',
+        sectionId: null,
+        sectionTitle: '',
+        tickets: [],
     };
-    paramsTask = {
-        projectId: null,
-        id: null,
+    paramsTicket = {
+        ticketId: null,
         title: '',
         description: '',
-        tags: '',
+        descriptionContent: '',
+        priority: TicketPriority.HIGH,
+        status: TicketStatus.IN_PROGRESS,
+        tasks:[]
     };
-    selectedTask: any = null;
-    @ViewChild('isAddProjectModal') isAddProjectModal!: ModalComponent;
-    @ViewChild('isAddTaskModal') isAddTaskModal!: ModalComponent;
-    @ViewChild('isDeleteModal') isDeleteModal!: ModalComponent;
-    projectList: any = [
-        {
-            id: 1,
-            title: 'In Progress',
-            tasks: [
-                {
-                    projectId: 1,
-                    id: 1.1,
-                    title: 'Creating a new Portfolio on Dribble',
-                    description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.',
-                    image: true,
-                    date: ' 08 Aug, 2020',
-                    tags: ['designing'],
-                },
-                {
-                    projectId: 1,
-                    id: 1.2,
-                    title: 'Singapore Team Meet',
-                    description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.',
-                    date: ' 09 Aug, 2020',
-                    tags: ['meeting'],
-                },
-            ],
-        },
-        {
-            id: 2,
-            title: 'Pending',
-            tasks: [
-                {
-                    projectId: 2,
-                    id: 2.1,
-                    title: 'Plan a trip to another country',
-                    description: '',
-                    date: ' 10 Sep, 2020',
-                },
-            ],
-        },
-        {
-            id: 3,
-            title: 'Complete',
-            tasks: [
-                {
-                    projectId: 3,
-                    id: 3.1,
-                    title: 'Dinner with Kelly Young',
-                    description: '',
-                    date: ' 08 Aug, 2020',
-                },
-                {
-                    projectId: 3,
-                    id: 3.2,
-                    title: 'Launch New SEO Wordpress Theme ',
-                    description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-                    date: ' 09 Aug, 2020',
-                },
-            ],
-        },
-        {
-            id: 4,
-            title: 'Working',
-            tasks: [],
-        },
-    ];
+    paramsTask = {
+        taskId: null,
+        title:'',
+        done:false
 
-    addEditProject(project: any = null) {
+    }
+    editorOptions = {
+        toolbar: [[{ header: [1, 2, false] }], ['bold', 'italic', 'underline', 'link'], [{ list: 'ordered' }, { list: 'bullet' }], ['clean']],
+    };
+
+    @ViewChild('isAddSectionModal') isAddSectionModal!: ModalComponent;
+    @ViewChild('isAddTicketModal') isAddTicketModal!: ModalComponent;
+    @ViewChild('isDeleteModal') isDeleteModal!: ModalComponent;
+    @ViewChild('isDeleteTaskModal') isDeleteTaskModal!: ModalComponent;
+    @ViewChild('isDeleteSectionModal') isDeleteSelectionModal!: ModalComponent;
+    @ViewChild('isClearAlllModal') isClearAlllModal!: ModalComponent;
+    @ViewChild('isViewTicketModal') isViewTicketModal!: ModalComponent;
+    @ViewChild('isAddTaskModal') isAddTaskModal!: ModalComponent;
+    selectedTab = '';
+
+    getBoardById() {
+        this.boardService.getBoardById(this.boardId).subscribe(
+            (response) => {
+                this.currentBoard = response;
+                this.sectionList = this.currentBoard.sections;
+                this.boardName = this.currentBoard.boardName;
+            },
+            (error) => {
+                console.error('Error geting board:', error);
+            }
+        );
+    }
+
+    addEditSection(section: any = null) {
         setTimeout(() => {
             this.params = {
-                id: null,
-                title: '',
+                sectionId: null,
+                sectionTitle: '',
+                tickets: [],
             };
-            if (project) {
-                this.params = JSON.parse(JSON.stringify(project));
+            if (section) {
+                this.params = JSON.parse(JSON.stringify(section));
             }
-            this.isAddProjectModal.open();
+            this.isAddSectionModal.open();
         });
     }
 
-    saveProject() {
-        if (!this.params.title) {
+    saveSection() {
+        if (!this.params.sectionTitle) {
             this.showMessage('Title is required.', 'error');
             return;
         }
 
-        if (this.params.id) {
-            //update project
-            const project = this.projectList.find((d: any) => d.id === this.params.id);
-            project.title = this.params.title;
-        } else {
-            //add project
-            const lastId = this.projectList.length
-                ? this.projectList.reduce((max: number, obj: any) => (obj.id > max ? obj.id : max), this.projectList[0].id)
-                : 0;
-
-            const project = {
-                id: lastId + 1,
-                title: this.params.title,
-                tasks: [],
+        if (this.params.sectionId) {
+            //update section
+            const sectionToUpdate: Section = {
+                sectionId: this.params.sectionId,
+                sectionTitle: this.params.sectionTitle,
+                description: this.params.sectionTitle,
+                tickets: this.params.tickets,
             };
-            this.projectList.push(project);
+            this.sectionService.updateSection(this.params.sectionId, sectionToUpdate).subscribe(
+                (response) => {
+                    console.log('section updated successfully:', response);
+                    let section:any = this.sectionList.find((section: any) => section.sectionId === this.params.sectionId);
+                    section.sectionTitle = sectionToUpdate.sectionTitle;
+                },
+                (error) => {
+                    console.error('Error updating section:', error);
+                }
+            );
+        } else {
+            //add section
+            const newSection: any = {
+                sectionId: null,
+                sectionTitle: this.params.sectionTitle,
+                description: this.params.sectionTitle,
+                tickets: [],
+            };
+            this.sectionService.newSection(this.boardId, newSection).subscribe(
+                (response) => {
+                    console.log('section added successfully:', response);
+                    this.sectionList.push(response);
+                },
+                (error) => {
+                    console.error('Error adding section:', error);
+                }
+            );
         }
 
-        this.showMessage('Project has been saved successfully.');
-        this.isAddProjectModal.close();
+        this.showMessage('section has been saved successfully.');
+        this.isAddSectionModal.close();
     }
 
-    deleteProject(project: any) {
-        this.projectList = this.projectList.filter((d: any) => d.id != project.id);
-        this.showMessage('Project has been deleted successfully.');
+    deleteSectionConfirm(section: Section) {
+        setTimeout(() => {
+            this.currentSection = section;
+            this.isDeleteSelectionModal.open();
+        });
     }
 
-    clearProjects(project: any) {
-        project.tasks = [];
+    clearConfirmModal(section: any = null) {
+        setTimeout(() => {
+            this.sectionToClear = section;
+            this.isClearAlllModal.open();
+        }, 10);
+    }
+    tasks!:Task[]
+    ViewTicketModal(ticket: Ticket , section:Section) {
+        setTimeout(() => {
+            this.currentSection = section;
+            this.paramsTicket = JSON.parse(JSON.stringify(ticket));
+            this.taskService.getTasksByTicket(ticket.ticketId).subscribe(
+                (response) => {
+                    console.log('tasks fetched successfully:', response);
+                    this.TasksList = response;
+                },
+                (error) => {
+                    console.error('Error gettig Tasks of ticket:'+ticket.ticketId, error);
+                }
+            );  
+            this.isViewTicketModal.open();
+            
+        }, 10);
+    }
+    clearAllTicket() {
+        this.ticketService.deleteAllTicket(this.sectionToClear.sectionId).subscribe({
+            next: () => {
+                this.sectionToClear.tickets = [];
+                this.showMessage('all Ticket has been deleted successfully.');
+                this.isClearAlllModal.close();
+            },
+            error: (err) => {
+                console.error('Error deleting Ticket:', err);
+            },
+        });
     }
 
+
+    deleteSection() {
+        this.sectionService.deleteSection(this.deletedSection.sectionId).subscribe({
+            next: () => {
+                console.log('Section after next');
+                this.sectionList = this.sectionList.filter((section: any) => section.sectionId != this.deletedSection.sectionId);
+                this.showMessage('Section has been deleted successfully.');
+                this.isDeleteSelectionModal.close();
+            },
+            error: (err) => {
+                console.error('Error deleting Section:', err);
+            },
+        });
+    }
     // task
-    addEditTask(projectId: any, task: any = null) {
-        this.paramsTask = {
-            projectId: null,
-            id: null,
+    addEditTicket(ticket: any = null, section: Section) {
+        this.paramsTicket = {
+            ticketId: null,
             title: '',
             description: '',
-            tags: '',
+            descriptionContent: '',
+            priority: TicketPriority.HIGH,
+            status: TicketStatus.IN_PROGRESS,
+            tasks:[]
         };
-        if (task) {
-            this.paramsTask = JSON.parse(JSON.stringify(task));
-            this.paramsTask.tags = this.paramsTask.tags ? this.paramsTask.tags.toString() : '';
+        if (ticket) {
+            this.paramsTicket = JSON.parse(JSON.stringify(ticket));
+
         }
-        this.paramsTask.projectId = projectId;
-        this.isAddTaskModal.open();
+        this.currentSection = section;
+        this.isAddTicketModal.open();
     }
 
+    saveTicket() {
+        if (!this.paramsTicket.title) {
+            this.showMessage('Title is required.', 'error');
+            return;
+        }
+
+        if (this.paramsTicket.ticketId) {
+            //update task            
+            const ticketToUpdate: any = {
+                ticketId: this.paramsTicket.ticketId,
+                title: this.paramsTicket.title,
+                description: this.paramsTicket.description,
+                priority: this.paramsTicket.priority,
+                status: this.paramsTicket.status,
+                descriptionContent:this.paramsTicket.descriptionContent
+            };
+            console.log(ticketToUpdate);
+            
+            this.ticketService.updateTicket(this.paramsTicket.ticketId, ticketToUpdate).subscribe(
+                (response) => {
+                    console.log('ticket updated successfully:', response);
+                    const ticket:any = this.sectionList.find((section: any) => section.sectionId === this.currentSection.sectionId)
+                                            ?.tickets.find((ticket:any) => ticket.ticketId === this.paramsTicket.ticketId);
+                    ticket.title = ticketToUpdate.title;
+                    ticket.description = ticketToUpdate.description;
+                    ticket.descriptionContent = ticketToUpdate.descriptionContent;
+                    ticket.priority = ticketToUpdate.priority;
+                    ticket.status = ticketToUpdate.status;
+                },
+                (error) => {
+                    console.error('Error updating ticket:', error);
+                }
+            );
+        } else {
+            //add task
+            const newTicket: any = {
+                ticketId: null,
+                title: this.paramsTicket.title,
+                description: this.paramsTicket.description,
+                priority: this.paramsTicket.priority,
+                status: this.paramsTicket.status,
+                descriptionContent:this.paramsTicket.description
+            };
+            this.ticketService.newTicket(this.currentSection.sectionId, newTicket).subscribe(
+                (response) => {
+                    console.log('Ticket added successfully:', response);
+                    this.sectionList.find((section: any) => section.sectionId === this.currentSection.sectionId)?.tickets.push(response);
+                },
+                (error) => {
+                    console.error('Error adding Ticket:', error);
+                }
+            );
+        }
+
+        this.showMessage('ticket has been saved successfully.');
+        this.isAddTicketModal.close();
+    }
+    addEditTask(task: any = null, ticket: any = null) {
+        this.paramsTask = {
+            taskId: null,
+            title:'',
+            done:false
+    
+        }
+        if (task) {
+            this.paramsTask = JSON.parse(JSON.stringify(task));
+        }
+        this.currentTicket = ticket;
+        this.isAddTaskModal.open();
+    }
     saveTask() {
+        console.log(this.paramsTask.title);
+        
         if (!this.paramsTask.title) {
             this.showMessage('Title is required.', 'error');
             return;
         }
 
-        const project = this.projectList.find((d: any) => d.id === this.paramsTask.projectId);
-        if (this.paramsTask.id) {
+        if (this.paramsTask.taskId) {
             //update task
-            const task = project.tasks.find((d: any) => d.id === this.paramsTask.id);
-            task.title = this.paramsTask.title;
-            task.description = this.paramsTask.description;
-            task.tags = this.paramsTask.tags?.length > 0 ? this.paramsTask.tags.split(',') : [];
+            const taskToUpdate: any = {
+                taskId: this.paramsTask.taskId,
+                title: this.paramsTask.title,
+                done: this.paramsTask.done
+            };
+            this.taskService.updateTask(this.paramsTask.taskId, taskToUpdate).subscribe(
+                (response) => {
+                    console.log('task updated successfully:', response);
+                    const task:any = this.TasksList.find((task:Task) => task.taskId === this.paramsTask.taskId);
+                    task.title = this.paramsTask.title;
+                },
+                (error) => {
+                    console.error('Error updating task:', error);
+                }
+            );
         } else {
             //add task
-            let maxid = 0;
-            if (project.tasks?.length) {
-                maxid = project.tasks.reduce((max: number, obj: any) => (obj.id > max ? obj.id : max), project.tasks[0].id);
-            }
-
-            const today = new Date();
-            const dd = String(today.getDate()).padStart(2, '0');
-            const mm = String(today.getMonth()); //January is 0!
-            const yyyy = today.getFullYear();
-            const monthNames: any = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
-            const task = {
-                projectId: this.paramsTask.projectId,
-                id: maxid + 0.1,
+            const newTask: any = {
+                taskId: null,
                 title: this.paramsTask.title,
-                description: this.paramsTask.description,
-                date: dd + ' ' + monthNames[mm] + ', ' + yyyy,
-                tags: this.paramsTask.tags?.length > 0 ? this.paramsTask.tags.split(',') : [],
+                done: this.paramsTask.done
             };
-
-            project.tasks.push(task);
+            this.taskService.newTask(this.currentTicket.ticketId, newTask).subscribe(
+                (response) => {
+                    console.log('task added successfully:', response);
+                    this.TasksList.push(response);
+                    const ticket:any = this.sectionList.find((section: any) => section.sectionId === this.currentSection.sectionId)
+                    ?.tickets.find((ticket:any) => ticket.ticketId === this.paramsTicket.ticketId);
+                    
+                    ticket.progress = this.calculateProgress(this.TasksList);
+                },
+                (error) => {
+                    console.error('Error adding task:', error);
+                }
+            );
         }
 
-        this.showMessage('Task has been saved successfully.');
+        this.showMessage('task has been saved successfully.');
         this.isAddTaskModal.close();
     }
 
-    deleteConfirmModal(projectId: any, task: any = null) {
-        this.selectedTask = task;
+
+    deleteConfirmModal(ticket: any = null) {
         setTimeout(() => {
+            this.ticketToDelete = ticket;
             this.isDeleteModal.open();
         }, 10);
     }
-
+    deleteTaskConfirmModal(task: any = null) {
+        setTimeout(() => {
+            this.taskToDelete = task;
+            this.isDeleteTaskModal.open();
+        }, 10);
+    }
+    deleteTicket() {
+        this.ticketService.deleteTicket(this.ticketToDelete.ticketId).subscribe({
+            next: () => {
+                const sectionToUpdate:any = this.sectionList.find((section: any) => section.sectionId === this.currentSection.sectionId);
+                const updatedTickets:Ticket[] = sectionToUpdate.tickets.filter((ticket: any) => ticket.ticketId !== this.ticketToDelete.ticketId);
+                sectionToUpdate.tickets = updatedTickets;
+                this.showMessage('Ticket has been deleted successfully.');
+                this.isDeleteModal.close();
+            },
+            error: (err) => {
+                console.error('Error deleting Ticket:', err);
+            },
+        });
+    }
     deleteTask() {
-        let project = this.projectList.find((d: any) => d.tasks.find((t: any) => t.id === this.selectedTask.id));
-        project.tasks = project.tasks.filter((d: any) => d.id != this.selectedTask.id);
-
-        this.showMessage('Task has been deleted successfully.');
-        this.isDeleteModal.close();
+        this.taskService.deleteTask(this.taskToDelete.taskId).subscribe({
+            next: () => {
+                this.TasksList=this.TasksList.filter((task:Task) => task.taskId !== this.taskToDelete.taskId);
+                const ticket:any = this.sectionList.find((section: any) => section.sectionId === this.currentSection.sectionId)
+                ?.tickets.find((ticket:any) => ticket.ticketId === this.paramsTicket.ticketId);
+                
+                ticket.progress = this.calculateProgress(this.TasksList);
+                this.showMessage('Task has been deleted successfully.');
+                this.isDeleteTaskModal.close();
+            },
+            error: (err) => {
+                console.error('Error deleting Task:', err);
+            },
+        });
     }
 
     showMessage(msg = '', type = 'success') {
@@ -232,4 +421,69 @@ export class BoardDetailsComponent {
             padding: '10px 20px',
         });
     }
+    filteredTasks: any = [];
+    calculateProgress(tasks:Task[]){
+        if (tasks.length === 0) {
+            return 0;
+        }
+        const doneTasksCount = tasks.filter(task => task.done).length;
+        const progressPercentage = (doneTasksCount / tasks.length) * 100;
+        return progressPercentage;
+
+    }
+    taskComplete(task: Task) {
+        if (task) {
+            task.done = !task.done;
+            this.taskService.updateTask(task.taskId, task).subscribe(
+                (response) => {
+                    console.log('task updated successfully:', response);
+                    let EditedTask:any = this.TasksList.find((task1:Task) => task1.taskId === task.taskId);
+                    EditedTask.done = task.done;
+                    const ticket:any = this.sectionList.find((section: any) => section.sectionId === this.currentSection.sectionId)
+                    ?.tickets.find((ticket:any) => ticket.ticketId === this.paramsTicket.ticketId);
+                    
+                    ticket.progress = this.calculateProgress(this.TasksList);
+
+                },
+                (error) => {
+                    console.error('Error updating task:', error);
+                }
+            );
+        }
+    }
+
+      
+    currentTicketToDrag!:any;
+    
+    onDragStart(ticketId: number){
+        this.currentTicketToDrag=ticketId;
+    }
+
+    onDrop(event: any,sectionId:number){
+        event.preventDefault();
+        this.ticketService.updateTickectSection(this.currentTicketToDrag, sectionId)
+          .subscribe({
+            next: () => {
+                this.getBoardById();
+                this.showMessage('Ticket updated successfully.');
+            },
+            error: (err) => {
+                console.error('Error draging Ticket:', err);
+            },
+        });
+        this.currentTicketToDrag=null;
+    }
+
+    onDragOver(event: any){
+        event.preventDefault();
+    }
+
+    setDiscriptionText(event: any) {
+        this.paramsTicket.description = event.text;
+        this.paramsTicket.descriptionContent = event.html;
+        console.log(this.paramsTicket);
+        
+    }
+
+
 }

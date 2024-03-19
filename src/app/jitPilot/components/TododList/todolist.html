@@ -208,7 +208,7 @@
                                                     class="line-clamp-1 min-w-[300px] overflow-hidden text-white-dark"
                                                     [ngClass]="{ 'line-through': task.status === 'complete' }"
                                                 >
-                                                    {{ task.descriptionText }}
+                                                    {{ task.description }}
                                                 </div>
                                             </div>
                                         </td>
@@ -429,7 +429,7 @@
                         </select>
                     </div>
                 </div>
-                <div class="mb-5">
+                <div class="mb-5"> 
                     <label>Description</label>
                     <quill-editor
                         #quillEditorObj

@@ -2,9 +2,9 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Routes, RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 
 // modal
-import { ModalModule } from 'angular-custom-modal';
 
 // sortable
 import { SortablejsModule } from '@dustfoundation/ngx-sortablejs';
@@ -32,18 +32,22 @@ import { IconModule } from 'src/app/shared/icon/icon.module';
 
 import { BoardDetailsComponent } from './components/Board/boardDetails';
 import { BoardsComponent } from './components/Board/boards';
-import { MembersComponent } from './components/Members/members';
 import { TodolistComponent } from './components/TododList/todolist';
 import { CalendarComponent } from './components/Calendar/calendar';
 import { WorkspaceComponent } from './components/workspace/workspace.component';
+import { ModalModule } from 'angular-custom-modal';
+import { MembersComponent } from './components/Members/members';
+import { WorkspaceDetailsComponent } from './components/workspace/workspaceDetails';
+import { TicketDetailsComponent } from './components/Board/ticket-details/ticket-details.component';
 
 const routes: Routes = [
     { path: 'jitPilot/scrumboard/:boardId', component: BoardDetailsComponent, title: 'Scrumboard | JitPilot' },
-    { path: 'jitPilot/members', component: MembersComponent, title: 'Members | JitPilot' },
-    { path: 'jitPilot/boards', component: BoardsComponent, title: 'Boards | JitPilot' },
+    { path: 'jitPilot/members/:workspaceId/members', component: MembersComponent, title: 'Members | JitPilot' },
+    { path: 'jitPilot/board/:workspaceId/boards', component: BoardsComponent, title: 'Boards | JitPilot' },
     { path: 'jitPilot/todolist', component: TodolistComponent, title: 'Todolist | JitPilot' },
     { path: 'jitPilot/calendar', component: CalendarComponent, title: 'Calendar | JitPilot' },
-    { path: 'jitPilot/workspaces', component: WorkspaceComponent, title: 'WorkSpace | JitPilot' },
+    { path: 'jitPilot/workspace/:workspaceId/boards', component: WorkspaceDetailsComponent, title: 'Boards | JitPilot' },
+
 ];
 
 @NgModule({
@@ -54,6 +58,7 @@ const routes: Routes = [
         ReactiveFormsModule,
         ModalModule,
         SortablejsModule,
+        DragDropModule,
         MenuModule,
         NgScrollbarModule.withConfig({
             visibility: 'hover',
@@ -72,6 +77,8 @@ const routes: Routes = [
         TodolistComponent,
         CalendarComponent,
         WorkspaceComponent,
+        WorkspaceDetailsComponent,
+        TicketDetailsComponent
 
     ],
 })
