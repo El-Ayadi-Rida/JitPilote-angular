@@ -110,7 +110,7 @@
                             <div *ngIf="member.firstName && member.lastName"
                                 class="grid w-14 h-14 place-content-center rounded-full bg-lime-700 text-xl font-semibold text-white ltr:mr-2 rtl:ml-2">
                                 {{ member.firstName.charAt(0) + '' + member.lastName.charAt(0) }}
-                            </div>    
+                            </div>
                         <!-- </ng-container> -->
 
                         <div class="flex-1 ltr:sm:pl-5 rtl:sm:pr-5 text-center sm:text-left">
@@ -129,10 +129,10 @@
     <!-- add contact modal -->
     <modal #addContactModal class="no-footer">
         <ng-template #modalHeader>
-            <div class="!font-medium">{{ params.controls['id'].value ? 'Edit Contact' : 'Invite Member' }}</div>
+            <div class="!font-medium">Invite Member</div>
         </ng-template>
         <ng-template #modalBody>
-            <form [formGroup]="params" class="text-sm" (ngSubmit)="saveUser()" ngNativeValidate>
+            <form [formGroup]="paramsInvite" class="text-sm" (ngSubmit)="inviteMember()" >
                 <div class="mb-5">
                     <label for="email">Email</label>
                     <input id="email" type="email" placeholder="Enter Email" class="form-input"
@@ -143,7 +143,7 @@
                     <button type="button" class="btn btn-outline-danger"
                         (click)="addContactModal.close()">Cancel</button>
                     <button type="submit"
-                        class="btn bg-lime-800 hover:bg-lime-700 text-white ltr:ml-4 rtl:mr-4">{{ params.controls['id'].value ? 'Update' : 'Add' }}</button>
+                        class="btn bg-lime-800 hover:bg-lime-700 text-white ltr:ml-4 rtl:mr-4">Invite</button>
                 </div>
             </form>
         </ng-template>
