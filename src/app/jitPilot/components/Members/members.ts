@@ -44,12 +44,36 @@ export class MembersComponent {
     @ViewChild('addContactModal') addContactModal!: ModalComponent;
     @ViewChild('isDeleteMemeberModal') isDeleteMemeberModal!: ModalComponent;
     params!: FormGroup;
+    paramsInvite!: FormGroup;
     filteredMembersList: UserResponse[] = [];
     memberList: UserResponse[] = [];
     searchUser = '';
     workspaceId!: number;
     deletedMember: any = null;
+    invetUser: UserResponse = {userId: 0, email:"", path:"",role:"",lastName:"",firstName:"",createdAt:new Date()};
 
+    buildFormInvite(){
+        this.paramsInvite = this.fb.group({
+            email: ['', Validators.required]
+        });
+    }
+    inviteMember(){
+        if (this.paramsInvite.valid) {
+            this.invetUser.email = this.paramsInvite.getRawValue().email;
+        }
+        this.userService.invitUserToWorkspace(this.workspaceId, this.invetUser).subscribe(
+            (res) =>{
+                console.log('User invited successfully:' , res);
+                this.invetUser = JSON.parse(JSON.stringify(res));
+                this.memberList.push(this.invetUser);
+                this.addContactModal.close();
+                this.showMessage('User invited successfully!.');
+            },
+            (error) => {
+                console.error('Error inviting user:', error);
+            }
+        )
+    }
     initForm() {
         this.params = this.fb.group({
             userId: [0],
@@ -64,10 +88,14 @@ export class MembersComponent {
     ngOnInit() {
         this.route.params.subscribe((params) => {
             this.workspaceId = params['workspaceId'];
+
             console.log(this.workspaceId);
         });
         this.searchContacts();
         this.getUsers();
+        this.buildFormInvite()
+        console.log(this.memberList);
+
     }
 
     getUsers(): void {
@@ -147,6 +175,8 @@ export class MembersComponent {
         }
     }
 
+
+
     saveUser() {
         if (this.params.controls['email'].errors) {
             this.showMessage('Email is required.', 'error');
@@ -183,6 +213,8 @@ export class MembersComponent {
         this.addContactModal.close();
     }
 
+
+
     showMessage(msg = '', type = 'success') {
         const toast: any = Swal.mixin({
             toast: true,
@@ -199,5 +231,6 @@ export class MembersComponent {
             padding: '10px 20px',
         });
     }
+
 }
 

@@ -41,5 +41,9 @@ export class UserService {
     getUserByWorkspace(workspacedId: number): Observable<UserResponse[]> {
         return this.http.get<UserResponse[]>(`${environment.URL_API}/workspaces/${workspacedId}/users`);
     }
+
+    invitUserToWorkspace(workspacedId: number, userInvite: UserResponse): Observable<string> {
+        return this.http.post<string>(`${environment.URL_API}/workspaces/${workspacedId}/inviteUser`,userInvite );
+    }
 }
 
