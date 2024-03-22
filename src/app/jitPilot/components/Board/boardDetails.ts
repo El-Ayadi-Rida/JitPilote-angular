@@ -15,6 +15,9 @@ import { TicketService } from '../../services/ticket.service';
 import { retry } from 'rxjs';
 import { Task } from '../../models/task';
 import { TaskService } from '../../services/task.service';
+import { Sprint } from '../../models/sprint';
+import { SprintService } from '../../services/sprint.service';
+import { log } from 'console';
 
 @Component({
     moduleId: module.id,
@@ -33,13 +36,15 @@ export class BoardDetailsComponent implements OnInit {
         private boardService: BoardService,
         private sectionService: SectionService,
         private ticketService: TicketService,
-        private taskService:TaskService
+        private taskService:TaskService,
+        private sprintService:SprintService
     ) {}
     ngOnInit(): void {
         this.route.params.subscribe((params) => {
             this.boardId = params['boardId'];
         });
         this.getBoardById();
+        this.getSprints();
         this.workspaceId = JSON.parse(sessionStorage.getItem('workspaceItem')!).workspaceId;
         console.log(this.workspaceId);
     }
@@ -57,6 +62,15 @@ export class BoardDetailsComponent implements OnInit {
     progress!:string;
     currentTicket!:Ticket
 
+    sprint: Sprint = {
+        sprintId: null,
+        sprintNumber: null,
+        startDate: new Date(),
+        endDate: new Date(),
+        achievedVelocity: null,
+        targetVelocity: null
+    }
+    
     params = {
         sectionId: null,
         sectionTitle: '',
@@ -75,11 +89,15 @@ export class BoardDetailsComponent implements OnInit {
         taskId: null,
         title:'',
         done:false
-
+        
     }
     editorOptions = {
         toolbar: [[{ header: [1, 2, false] }], ['bold', 'italic', 'underline', 'link'], [{ list: 'ordered' }, { list: 'bullet' }], ['clean']],
     };
+    
+    sprintsList: Sprint[] = [    ]
+    selectedSprint!: Sprint
+
 
     @ViewChild('isAddSectionModal') isAddSectionModal!: ModalComponent;
     @ViewChild('isAddTicketModal') isAddTicketModal!: ModalComponent;
@@ -89,6 +107,7 @@ export class BoardDetailsComponent implements OnInit {
     @ViewChild('isClearAlllModal') isClearAlllModal!: ModalComponent;
     @ViewChild('isViewTicketModal') isViewTicketModal!: ModalComponent;
     @ViewChild('isAddTaskModal') isAddTaskModal!: ModalComponent;
+    @ViewChild('isAddSprintModal') isAddSprintModal!: ModalComponent;
     selectedTab = '';
 
     getBoardById() {
@@ -96,12 +115,27 @@ export class BoardDetailsComponent implements OnInit {
             (response) => {
                 this.currentBoard = response;
                 this.sectionList = this.currentBoard.sections;
+                // console.log("helllllllllooo=>>", this.sectionList);
+                
                 this.boardName = this.currentBoard.boardName;
             },
             (error) => {
                 console.error('Error geting board:', error);
             }
         );
+    }
+
+    getSprints(){
+        this.sprintService.getSprintsByBoard(this.boardId).subscribe(
+            (response) => {
+                this.sprintsList = response;
+                this.selectedSprint = this.sprintsList[0]
+                // console.log("helooooooooooooooooo Sprints =>>>>", response);
+            },
+            (error) => {
+                console.error('Error geting Sprints:', error);
+            }
+        )
     }
 
     addEditSection(section: any = null) {
@@ -116,6 +150,12 @@ export class BoardDetailsComponent implements OnInit {
             }
             this.isAddSectionModal.open();
         });
+    }
+
+
+    addSprint(){
+        // this.sprint = JSON.parse(JSON.stringify(this.sprint));
+        this.isAddSprintModal.open();
     }
 
     saveSection() {
@@ -165,9 +205,36 @@ export class BoardDetailsComponent implements OnInit {
         this.isAddSectionModal.close();
     }
 
+    saveSprint() {
+        console.log("new Sprint Object Details =====>", this.sprint);
+        // this.sprint.startDate = this.sprint.startDate?.toLocaleDateString
+        // if(typeof this.sprint.startDate === 'string'){
+        //     console.log("typeof startdate field before =====>", typeof this.sprint.startDate);
+        //     this.sprint.startDate = new Date(this.sprint.startDate)
+        //     console.log("typeof startdate field after =====>", typeof this.sprint.startDate);
+        // }
+        
+        
+
+        this.sprintService.addSprint(this.boardId, this.sprint).subscribe(
+            (response) => {
+                console.log("Sprint added successfully: ", response);
+                console.log("new Sprint response Object ===>", response);
+                this.isAddSprintModal.close();
+                this.showMessage('Sprint has been added successfully.');
+                this.sprintsList.push(response)
+            },
+            (error) => {
+                console.error('Error adding sprint:', error);
+            }
+        )
+
+    }
+
     deleteSectionConfirm(section: Section) {
         setTimeout(() => {
             this.currentSection = section;
+            console.log("helooooooo==>", this.currentSection) 
             this.isDeleteSelectionModal.open();
         });
     }
@@ -211,10 +278,10 @@ export class BoardDetailsComponent implements OnInit {
 
 
     deleteSection() {
-        this.sectionService.deleteSection(this.deletedSection.sectionId).subscribe({
+        this.sectionService.deleteSection(this.currentSection.sectionId).subscribe({
             next: () => {
                 console.log('Section after next');
-                this.sectionList = this.sectionList.filter((section: any) => section.sectionId != this.deletedSection.sectionId);
+                this.sectionList = this.sectionList.filter((section: any) => section.sectionId != this.currentSection.sectionId);
                 this.showMessage('Section has been deleted successfully.');
                 this.isDeleteSelectionModal.close();
             },
@@ -483,6 +550,10 @@ export class BoardDetailsComponent implements OnInit {
         this.paramsTicket.descriptionContent = event.html;
         console.log(this.paramsTicket);
         
+    }
+
+    changeSelectedSprint(sprint: any){
+        this.selectedSprint = sprint
     }
 
 

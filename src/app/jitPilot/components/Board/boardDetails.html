@@ -35,10 +35,31 @@
     </ol>
 </div>
 <div>
-    <div class="pt-3">
+    <div class="flex flex-inline pt-3">
         <button type="button" class="btn bg-lime-800 hover:bg-lime-700 text-white ltr:ml-4 rtl:mr-4 flex" (click)="addEditSection()">
             <icon-plus class="h-5 w-5 ltr:mr-3 rtl:ml-3" />
             Add Section
+        </button>
+        <div hlMenu class="dropdown">
+            <button type="button" hlMenuButton class="btn btn-primary dropdown-toggle ltr:ml-4 rtl:mr-4 flex">
+                <!-- {{ selectedSprint=='All Sprints'? selectedSprint : 'Sprint '+selectedSprint.sprint_num }} -->
+                {{ selectedSprint? "Sprint " + selectedSprint!.sprintNumber:"Sprints" }}
+                <icon-caret-down class="inline-block ltr:ml-1 rtl:mr-1" />
+            </button>
+            <ul *hlMenuItems @toggleAnimation class="whitespace-nowrap ltr:right-0 rtl:left-0">
+                <!-- <li><a href="javascript:;" *hlMenuItem="let menuItem" (click)="changeSelectedSprint(sprint)">All Sprint</a></li> -->
+                <ng-container *ngFor="let sprint of sprintsList" key="sprint.id">
+                    <li><a href="javascript:;" *hlMenuItem="let menuItem" (click)="changeSelectedSprint(sprint)">{{ "Sprint " + sprint.sprintNumber }}</a></li>
+                </ng-container>
+                
+                <!-- <li><a href="javascript:;" *hlMenuItem="let menuItem">Another action</a></li>
+                <li><a href="javascript:;" *hlMenuItem="let menuItem">Something else here</a></li>
+                <li><a href="javascript:;" *hlMenuItem="let menuItem">Separated link</a></li> -->
+            </ul>
+        </div>
+        <button type="button" class="btn bg-lime-800 hover:bg-lime-700 text-white ltr:ml-4 rtl:mr-4 flex" (click)="addSprint()">
+            <icon-plus class="h-5 w-5 ltr:mr-3 rtl:ml-3" />
+            Add Sprint
         </button>
     </div>
 
@@ -73,40 +94,37 @@
                         </div>
 
                         <!-- ticket list -->
-                        <div
-                            [sortablejs]="section.tickets"
+                        <div [sortablejs]="section.tickets"
                             [sortablejsOptions]="{ animation: 200, group: 'default', ghostClass: 'sortable-ghost', dragClass:'sortable-drag' }"
-                            class="connect-sorting-content min-h-[150px]"
-                        >
-                        <div class="sortable-list" *ngFor="let ticket of section.tickets" 
-                             key="section.sectionId + '' + ticket.ticketId"
-                             draggable="true"  (dragstart)="onDragStart(ticket.ticketId)">
-                            <div class="mb-5 cursor-move space-y-3 rounded-md bg-[#f4f4f4] p-3 pb-5 shadow dark:bg-white-dark/20"
-                                >
+                            class="connect-sorting-content min-h-[150px]">
+                            <div class="sortable-list" *ngFor="let ticket of section.tickets" key="section.sectionId + '' + ticket.ticketId"
+                                draggable="true" (dragstart)="onDragStart(ticket.ticketId)">
+                                <div *ngIf="ticket.sprint.sprintNumber == selectedSprint.sprintNumber">
+                                <div class="mb-5 cursor-move space-y-3 rounded-md bg-[#f4f4f4] p-3 pb-5 shadow dark:bg-white-dark/20">
                                     <!-- if ticket have image -->
                                     <!-- <ng-container *ngIf="ticket.title">
-                                        <img src="/assets/images/carousel1.jpeg" alt="images" class="h-32 w-full rounded-md object-cover" />
-                                    </ng-container> -->
+                                                                                        <img src="/assets/images/carousel1.jpeg" alt="images" class="h-32 w-full rounded-md object-cover" />
+                                                                                    </ng-container> -->
                                     <div class="text-base font-medium">{{ ticket.title }}</div>
-                                    <p class="line-clamp-1 min-w-[250px] overflow-hidden text-white-dark">{{ ticket.description.toString() }}</p>
-                                    <div class="flex flex-wrap items-center gap-2"
-                                    (click)="ViewTicketModal(ticket,section)"
-                                    >
+                                    <p class="line-clamp-1 min-w-[250px] overflow-hidden text-white-dark">{{ ticket.description.toString() }}
+                                    </p>
+                                    <!-- <p class="line-clamp-1 min-w-[250px] overflow-hidden text-white-dark">{{ ticket.sprint.sprintNumber }}</p> -->
+                                    <div class="flex flex-wrap items-center gap-2" (click)="ViewTicketModal(ticket,section)">
                                         <ng-container *ngIf="ticket.priority !== 'LOW'; else elseBlock">
-                                                <div class="btn btn-outline-primary flex px-2 py-1">
-                                                    <icon-tag class="shrink-0" />
-
-                                                    <span class="ltr:ml-2 rtl:mr-2">{{ ticket.priority }}</span>
-                                                </div>
-                                           
-                                        </ng-container> 
+                                            <div class="btn btn-outline-primary flex px-2 py-1">
+                                                <icon-tag class="shrink-0" />
+                        
+                                                <span class="ltr:ml-2 rtl:mr-2">{{ ticket.priority }}</span>
+                                            </div>
+                        
+                                        </ng-container>
                                         <ng-template #elseBlock>
                                             <div class="btn flex px-2 py-1 text-white-dark shadow-none dark:border-white-dark/50">
                                                 <icon-tag class="shrink-0" />
                                                 <span class="ltr:ml-2 rtl:mr-2">{{ ticket.priority }}</span>
                                             </div>
                                         </ng-template>
-                                        
+                        
                                     </div>
                                     <div class="flex items-center justify-between">
                                         <div class="flex items-center font-medium hover:text-primary">
@@ -123,16 +141,19 @@
                                         </div>
                                     </div>
                                     <div class="space-y-2">
-                                        <h3 class="text-base" [ngClass]="{'text-success': ticket.progress >= 80, 'text-warning': ticket.progress >= 50 && ticket.progress < 80, 'text-danger': ticket.progress < 50}">
+                                        <h3 class="text-base"
+                                            [ngClass]="{'text-success': ticket.progress >= 80, 'text-warning': ticket.progress >= 50 && ticket.progress < 80, 'text-danger': ticket.progress < 50}">
                                             Ticket Progress ({{ticket.progress.toFixed(2)}}%)
                                         </h3>
                                         <div class="flex h-2.5 w-full rounded-full bg-[#ebedf2] dark:bg-dark/40">
-                                            <div class="h-2.5 rounded-full rounded-bl-full text-center text-xs text-white" [style.width.%]="ticket.progress.toFixed(2)"
-                                            [ngClass]="{'bg-success': ticket.progress >= 80, 'bg-warning': ticket.progress >= 50 && ticket.progress < 80, 'bg-danger': ticket.progress < 50}"
-                                            ></div>
+                                            <div class="h-2.5 rounded-full rounded-bl-full text-center text-xs text-white"
+                                                [style.width.%]="ticket.progress.toFixed(2)"
+                                                [ngClass]="{'bg-success': ticket.progress >= 80, 'bg-warning': ticket.progress >= 50 && ticket.progress < 80, 'bg-danger': ticket.progress < 50}">
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
+                            </div>
                             </div>
                         </div>
 
@@ -170,6 +191,42 @@
         </ng-template>
     </modal>
 
+    <!-- add sprint modal -->
+    <modal #isAddSprintModal class="no-footer">
+        <ng-template #modalHeader>
+            <div class="!font-medium">Add Sprint</div>
+        </ng-template>
+        <ng-template #modalBody>
+            <form (ngSubmit)="saveSprint()" class="text-sm">
+                <div class="grid gap-5">
+                    <div>
+                        <label for="sprint_number">Number</label>
+                        <input id="sprint_number" [(ngModel)]="sprint!.sprintNumber!" name="sprint_number" type="number"
+                            class="form-input mt-1" placeholder="Enter Numer" />
+                    
+                        <label for="sprint_start">Start Date</label>
+                        <!-- <ng2-flatpickr id="sprint_start" [config]="basic" name="sprint_start" *Input [(ngModel)]="sprint!.startDate"
+                            class="form-input mt-1"></ng2-flatpickr> -->
+                        <input id="sprint_start" [(ngModel)]="sprint!.startDate" name="sprint_start" type="date" class="form-input mt-1" placeholder="Enter Start Date" />
+                    
+                        <label for="sprint_end">End Date</label>
+                        <input id="sprint_end" [(ngModel)]="sprint!.endDate" name="sprint_end" type="date" class="form-input mt-1"
+                            placeholder="Enter End Date" />
+                    
+                        <label for="sprint_velocity">Velocity</label>
+                        <input id="sprint_velocity" [(ngModel)]="sprint!.targetVelocity" name="sprint_velocity" type="number"
+                            class="form-input mt-1" placeholder="Enter Velocity" />
+                    </div>
+                </div>
+            
+                <div class="mt-8 flex items-center justify-end">
+                    <button type="button" class="btn btn-outline-danger" (click)="isAddSprintModal.close()">Cancel</button>
+                    <button type="submit" class="btn btn-primary ltr:ml-4 rtl:mr-4">Add</button>
+                </div>
+            </form>
+        </ng-template>
+    </modal>
+
     <!-- add task modal -->
     <modal #isAddTicketModal class="no-footer">
         <ng-template #modalHeader>
@@ -181,6 +238,11 @@
                     <div>
                         <label for="taskTitle">Name</label>
                         <input id="taskTitle" [(ngModel)]="paramsTicket.title" name="title" type="text" class="form-input" placeholder="Enter Name" />
+                    </div>
+                    <div>
+                        <label for="taskTitle">Sprint</label>
+                        <ng-select [items]="sprintsList" [(ngModel)]="sprint" [searchable]="false" [clearable]="false" class="custom-multiselect"> </ng-select>
+                        <!-- <input id="taskTitle" [(ngModel)]="paramsTicket.title" name="title" type="text" class="form-input" placeholder="Enter Name" /> -->
                     </div>
 
                     <!-- <div>

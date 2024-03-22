@@ -1,3 +1,4 @@
+import { Sprint } from "./sprint";
 import { Task } from "./task";
 import { TicketPriority } from "./ticket-priority";
 import { TicketStatus } from "./ticket-status";
@@ -16,4 +17,5 @@ export interface Ticket {
     users: UserResponse[];
     progress:number;
     endDate:Date;
+    sprint: Sprint
 }
