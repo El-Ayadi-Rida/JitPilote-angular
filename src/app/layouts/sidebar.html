@@ -32,20 +32,18 @@
                     </div>
                   <ng-template #notWorkspaceList>
                     <ul class="relative space-y-0.5 p-4 py-0 font-semibold">
-                        <li class="nav-item" >
-                            <a [routerLink]="['/jitPilot/board', workspace.workspaceId, 'boards']" class="flex font-semibold">
-                                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-dark text-white ltr:mr-4 rtl:ml-4">
-                                    <!-- <span *ngIf="workspace.name else loading">{{ workspace.name.slice(0, 2).toUpperCase() }}</span>
-                                    <ng-template #loading>
-                                    <span>loading</span>
-                                    </ng-template> -->
-                                    <span *ngIf="workspace.name">{{ workspace.name.slice(0, 2).toUpperCase() }}</span>
-                                </div>
-                                <div>
-                                    <!-- <h3 class="text-base max-w-lg text-xl font-semibold leading-normal text-gray-900 dark:text-dark">{{workspace.name}}</h3> -->
-                                    <h3 class="text-base max-w-lg text-base font-semibold leading-normal text-gray-900 dark:text-dark">{{workspace.name}}</h3>
-
-                                    <p class="mt-1 text-xs text-white-dark">JobInTech</p>
+                        <li class="nav-item">
+                            <a [routerLink]="['/jitPilot/board', workspace.workspaceId, 'boards']" class="flex" routerLinkActive="active" (click)="toggleMobileMenu()">
+                                <div class="flex items-center">
+                                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-dark text-white ltr:mr-4 rtl:ml-4">
+                                        <span *ngIf="workspace.name">{{ workspace.name.slice(0, 2).toUpperCase() }}</span>
+                                    </div>
+                                    <div>
+                                        <!-- <h3 class="text-base max-w-lg text-xl font-semibold leading-normal text-gray-900 dark:text-dark">{{workspace.name}}</h3> -->
+                                        <h3 class="line-clamp-1 overflow-hidden text-base text-base font-semibold leading-normal text-gray-900 dark:text-dark">{{workspaceName}}</h3>
+    
+                                        <p class="mt-1 text-xs text-white-dark">JobInTech</p>
+                                    </div>
                                 </div>
                             </a>
                         </li>

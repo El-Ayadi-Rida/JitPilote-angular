@@ -40,6 +40,10 @@ import { MembersComponent } from './components/Members/members';
 import { WorkspaceDetailsComponent } from './components/workspace/workspaceDetails';
 import { TicketDetailsComponent } from './components/Board/ticket-details/ticket-details.component';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { RepportsComponent } from './components/analytics-repports/repports/repports.component';
+import { AnalyticsComponent } from "./components/analytics-repports/analytics/AnalyticsComponent";
+import { NgApexchartsModule } from 'ng-apexcharts';
+
 
 const routes: Routes = [
     { path: 'jitPilot/scrumboard/:boardId', component: BoardDetailsComponent, title: 'Scrumboard | JitPilot' },
@@ -47,7 +51,9 @@ const routes: Routes = [
     { path: 'jitPilot/board/:workspaceId/boards', component: BoardsComponent, title: 'Boards | JitPilot' },
     { path: 'jitPilot/todolist', component: TodolistComponent, title: 'Todolist | JitPilot' },
     { path: 'jitPilot/calendar', component: CalendarComponent, title: 'Calendar | JitPilot' },
-    { path: 'jitPilot/workspace/:workspaceId/boards', component: WorkspaceDetailsComponent, title: 'Boards | JitPilot' },
+    { path: 'jitPilot/workspace/:workspaceId/boards', component: WorkspaceDetailsComponent, title: 'Analytics | JitPilot' },
+    { path: 'jitPilot/analytics/:boardId', component: AnalyticsComponent, title: 'Calendar | JitPilot' },
+    { path: 'jitPilot/repports/:boardId', component: RepportsComponent, title: 'Repports | JitPilot' },
 
 ];
 
@@ -61,6 +67,7 @@ const routes: Routes = [
         SortablejsModule,
         DragDropModule,
         MenuModule,
+        NgApexchartsModule,
         NgScrollbarModule.withConfig({
             visibility: 'hover',
             appearance: 'standard',
@@ -80,7 +87,10 @@ const routes: Routes = [
         CalendarComponent,
         WorkspaceComponent,
         WorkspaceDetailsComponent,
-        TicketDetailsComponent
+        TicketDetailsComponent,
+        RepportsComponent,
+        AnalyticsComponent,
+
 
     ],
 })

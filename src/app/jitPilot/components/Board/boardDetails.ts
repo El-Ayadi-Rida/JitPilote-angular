@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import Swal from 'sweetalert2';
 import { animate, style, transition, trigger } from '@angular/animations';
 import { ModalComponent } from 'angular-custom-modal';
+import { FlatpickrOptions } from 'ng2-flatpickr';
 import { ActivatedRoute } from '@angular/router';
 import { BoardService } from '../../services/board.service';
 import { FormBuilder } from '@angular/forms';
@@ -47,7 +48,7 @@ export class BoardDetailsComponent implements OnInit {
         this.getSprints();
         this.workspaceId = JSON.parse(sessionStorage.getItem('workspaceItem')!).workspaceId;
         console.log(this.workspaceId);
-    }
+    }    
     boardId: number = 0;
     currentBoard!: Board;
     boardName!: string;
@@ -70,6 +71,14 @@ export class BoardDetailsComponent implements OnInit {
         achievedVelocity: null,
         targetVelocity: null
     }
+    sprintParams = {
+        sprintId: null,
+        sprintNumber: null,
+        startDate: new Date(),
+        endDate: new Date(),
+        achievedVelocity: null,
+        targetVelocity: null
+    };
     
     params = {
         sectionId: null,
@@ -94,7 +103,6 @@ export class BoardDetailsComponent implements OnInit {
     editorOptions = {
         toolbar: [[{ header: [1, 2, false] }], ['bold', 'italic', 'underline', 'link'], [{ list: 'ordered' }, { list: 'bullet' }], ['clean']],
     };
-    
     sprintsList: Sprint[] = [    ]
     selectedSprint!: Sprint
 
@@ -108,6 +116,7 @@ export class BoardDetailsComponent implements OnInit {
     @ViewChild('isViewTicketModal') isViewTicketModal!: ModalComponent;
     @ViewChild('isAddTaskModal') isAddTaskModal!: ModalComponent;
     @ViewChild('isAddSprintModal') isAddSprintModal!: ModalComponent;
+
     selectedTab = '';
 
     getBoardById() {
@@ -115,7 +124,8 @@ export class BoardDetailsComponent implements OnInit {
             (response) => {
                 this.currentBoard = response;
                 this.sectionList = this.currentBoard.sections;
-                // console.log("helllllllllooo=>>", this.sectionList);
+                console.log("res=>>", this.currentBoard);
+                console.log("Sections=>>", this.sectionList);
                 
                 this.boardName = this.currentBoard.boardName;
             },
@@ -154,8 +164,17 @@ export class BoardDetailsComponent implements OnInit {
 
 
     addSprint(){
-        // this.sprint = JSON.parse(JSON.stringify(this.sprint));
-        this.isAddSprintModal.open();
+        setTimeout(() => {
+            this.sprintParams = {
+                sprintId: null,
+                sprintNumber: null,
+                startDate: new Date(),
+                endDate: new Date(),
+                achievedVelocity: null,
+                targetVelocity: null
+            };
+            this.isAddSprintModal.open();
+        });
     }
 
     saveSection() {
@@ -206,7 +225,7 @@ export class BoardDetailsComponent implements OnInit {
     }
 
     saveSprint() {
-        console.log("new Sprint Object Details =====>", this.sprint);
+        console.log("new Sprint Object Details =====>", this.sprintParams);
         // this.sprint.startDate = this.sprint.startDate?.toLocaleDateString
         // if(typeof this.sprint.startDate === 'string'){
         //     console.log("typeof startdate field before =====>", typeof this.sprint.startDate);
@@ -215,8 +234,16 @@ export class BoardDetailsComponent implements OnInit {
         // }
         
         
+        // this.sprint.startDate = this.sprint.startDate?.getDate;        
+        const newSprint: any = {
+            sprintId: null,
+            sprintNumber: this.sprintParams.sprintNumber,
+            startDate: new Date(this.sprintParams.startDate),
+            endDate: new Date(this.sprintParams.endDate),
+            targetVelocity: this.sprintParams.targetVelocity
+        };
 
-        this.sprintService.addSprint(this.boardId, this.sprint).subscribe(
+        this.sprintService.addSprint(this.boardId, newSprint).subscribe(
             (response) => {
                 console.log("Sprint added successfully: ", response);
                 console.log("new Sprint response Object ===>", response);
