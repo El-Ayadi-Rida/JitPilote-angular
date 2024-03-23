@@ -24,6 +24,7 @@
             class="flex items-center before:relative before:-top-0.5 before:mx-4 before:inline-block before:h-1 before:w-1 before:rounded-full before:bg-primary"
         >
             <a
+                [routerLink]="['/jitPilot/scrumboard', boardId]"
                 class="flex items-center justify-center rounded-md border border-gray-500/20 p-2.5 shadow hover:text-gray-500/70 dark:border-0 dark:bg-[#191e3a] dark:hover:text-white-dark/70"
                 
             >
@@ -32,6 +33,30 @@
                 {{boardName}}
             </a>
         </li>
+        <li
+        class="flex items-center before:relative before:-top-0.5 before:mx-4 before:inline-block before:h-1 before:w-1 before:rounded-full before:bg-primary"
+    >
+        <a
+            [routerLink]="['/jitPilot/analytics', boardId]"
+            class="flex items-center justify-center rounded-md border border-gray-500/20 p-2.5 text-primary shadow dark:border-0 dark:bg-[#191e3a]"
+        >
+            <icon-menu-charts class="shrink-0 ltr:mr-2 rtl:ml-2" />
+
+            Analytics
+        </a>
+    </li>
+    <li
+    class="flex items-center before:relative before:-top-0.5 before:mx-4 before:inline-block before:h-1 before:w-1 before:rounded-full before:bg-primary"
+>
+    <a
+        [routerLink]="['/jitPilot/repports', boardId]"
+        class="flex items-center justify-center rounded-md border border-gray-500/20 p-2.5 text-primary shadow dark:border-0 dark:bg-[#191e3a]"
+    >
+        <icon-bar-chart class="shrink-0 ltr:mr-2 rtl:ml-2" />
+
+        Repports
+    </a>
+</li>
     </ol>
 </div>
 <div>
@@ -201,20 +226,25 @@
                 <div class="grid gap-5">
                     <div>
                         <label for="sprint_number">Number</label>
-                        <input id="sprint_number" [(ngModel)]="sprint!.sprintNumber!" name="sprint_number" type="number"
+                        <input id="sprint_number" [(ngModel)]="sprintParams!.sprintNumber!" name="sprint_number" type="number"
                             class="form-input mt-1" placeholder="Enter Numer" />
                     
                         <label for="sprint_start">Start Date</label>
                         <!-- <ng2-flatpickr id="sprint_start" [config]="basic" name="sprint_start" *Input [(ngModel)]="sprint!.startDate"
                             class="form-input mt-1"></ng2-flatpickr> -->
-                        <input id="sprint_start" [(ngModel)]="sprint!.startDate" name="sprint_start" type="date" class="form-input mt-1" placeholder="Enter Start Date" />
+                        <input id="sprint_start" [(ngModel)]="sprintParams!.startDate" name="sprint_start" type="date" class="form-input mt-1" placeholder="Enter Start Date" />
                     
                         <label for="sprint_end">End Date</label>
-                        <input id="sprint_end" [(ngModel)]="sprint!.endDate" name="sprint_end" type="date" class="form-input mt-1"
+                        <input id="sprint_end" 
+                        [(ngModel)]="sprintParams!.endDate" 
+                        [value]="sprintParams.endDate | date: 'yyyy-MM-dd'"
+                        name="sprint_end" 
+                        type="date" 
+                        class="form-input mt-1"
                             placeholder="Enter End Date" />
                     
                         <label for="sprint_velocity">Velocity</label>
-                        <input id="sprint_velocity" [(ngModel)]="sprint!.targetVelocity" name="sprint_velocity" type="number"
+                        <input id="sprint_velocity" [(ngModel)]="sprintParams!.targetVelocity" name="sprint_velocity" type="number"
                             class="form-input mt-1" placeholder="Enter Velocity" />
                     </div>
                 </div>

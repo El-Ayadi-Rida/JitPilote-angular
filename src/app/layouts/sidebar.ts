@@ -25,6 +25,7 @@ export class SidebarComponent {
     activeDropdown: string[] = [];
     parentDropdown: string = '';
     userBoardList!:Board[];
+    workspaceName!:String;
     constructor(
         public translate: TranslateService, 
         public storeData: Store<any>, 
@@ -57,6 +58,10 @@ export class SidebarComponent {
 
             this.workspace=JSON.parse(sessionStorage.getItem("workspaceItem")!);
             console.log(this.workspace);
+            console.log(this.workspace.name.slice(0,17));
+
+            this.workspaceName = this.workspace.name.length <= 17? this.workspace.name : this.workspace.name.slice(0,17)+'...';
+            
 
 
             this.getBoardsByWorkspaceAndUser();

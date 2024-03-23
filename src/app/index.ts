@@ -19,6 +19,7 @@ export class IndexComponent {
     dailySales: any;
     totalOrders: any;
     isLoading = true;
+    
     constructor(public storeData: Store<any>) {
         this.initStore();
         this.isLoading = false;
