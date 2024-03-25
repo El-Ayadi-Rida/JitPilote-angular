@@ -585,3 +585,4 @@ export class BoardDetailsComponent implements OnInit {
 
 
 }
+

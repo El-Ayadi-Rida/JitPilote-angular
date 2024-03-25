@@ -17,5 +17,6 @@ export interface Ticket {
     users: UserResponse[];
     progress:number;
     endDate:Date;
-    sprint: Sprint
+    sprint: Sprint;
+    complexityPoints:number;
 }
