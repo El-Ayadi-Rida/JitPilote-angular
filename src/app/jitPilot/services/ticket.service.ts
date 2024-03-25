@@ -10,8 +10,8 @@ import { Ticket } from '../models/ticket';
 export class TicketService {
     constructor(private http: HttpClient) {}
 
-    newTicket(sectionId: number, ticket: Ticket): Observable<Ticket> {
-        return this.http.post<Ticket>(`${environment.URL_API}/tickets/${sectionId}`, ticket);
+    newTicket(sectionId: number,sprintId: number, ticket: Ticket): Observable<Ticket> {
+        return this.http.post<Ticket>(`${environment.URL_API}/tickets/${sectionId}/${sprintId}`, ticket);
     }
 
     updateTicket(ticketId: number, ticket: Ticket): Observable<Ticket> {
@@ -28,6 +28,14 @@ export class TicketService {
 
     updateTickectSection(tickectId: number,sectionId: number): Observable<Ticket> {
         return this.http.put<Ticket>(`${environment.URL_API}/tickets/${tickectId}/section/${sectionId}`,{});
+    }
+    addUserInTicket(tickectId:number,userId:number){
+        return this.http.put<Ticket>(`${environment.URL_API}/tickets/${tickectId}/assignuser/${userId}`,{});
+
+    }
+    removeUserFromTicket(tickectId:number,userId:number){
+        return this.http.put<Ticket>(`${environment.URL_API}/tickets/${tickectId}/unassignuser/${userId}`,{});
+
     }
 
 }

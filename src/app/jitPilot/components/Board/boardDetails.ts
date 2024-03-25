@@ -92,7 +92,8 @@ export class BoardDetailsComponent implements OnInit {
         descriptionContent: '',
         priority: TicketPriority.HIGH,
         status: TicketStatus.IN_PROGRESS,
-        tasks:[]
+        tasks:[],
+        complexityPoints:0
     };
     paramsTask = {
         taskId: null,
@@ -104,7 +105,7 @@ export class BoardDetailsComponent implements OnInit {
         toolbar: [[{ header: [1, 2, false] }], ['bold', 'italic', 'underline', 'link'], [{ list: 'ordered' }, { list: 'bullet' }], ['clean']],
     };
     sprintsList: Sprint[] = [    ]
-    selectedSprint!: Sprint
+    selectedSprint!: any;
 
 
     @ViewChild('isAddSectionModal') isAddSectionModal!: ModalComponent;
@@ -140,7 +141,7 @@ export class BoardDetailsComponent implements OnInit {
             (response) => {
                 this.sprintsList = response;
                 this.selectedSprint = this.sprintsList[0]
-                // console.log("helooooooooooooooooo Sprints =>>>>", response);
+                console.log("helooooooooooooooooo Sprints =>>>>", this.sprintsList);
             },
             (error) => {
                 console.error('Error geting Sprints:', error);
@@ -326,7 +327,8 @@ export class BoardDetailsComponent implements OnInit {
             descriptionContent: '',
             priority: TicketPriority.HIGH,
             status: TicketStatus.IN_PROGRESS,
-            tasks:[]
+            tasks:[],
+            complexityPoints:0
         };
         if (ticket) {
             this.paramsTicket = JSON.parse(JSON.stringify(ticket));
@@ -350,7 +352,7 @@ export class BoardDetailsComponent implements OnInit {
                 description: this.paramsTicket.description,
                 priority: this.paramsTicket.priority,
                 status: this.paramsTicket.status,
-                descriptionContent:this.paramsTicket.descriptionContent
+                descriptionContent:this.paramsTicket.descriptionContent,
             };
             console.log(ticketToUpdate);
             
@@ -364,6 +366,7 @@ export class BoardDetailsComponent implements OnInit {
                     ticket.descriptionContent = ticketToUpdate.descriptionContent;
                     ticket.priority = ticketToUpdate.priority;
                     ticket.status = ticketToUpdate.status;
+
                 },
                 (error) => {
                     console.error('Error updating ticket:', error);
@@ -379,7 +382,7 @@ export class BoardDetailsComponent implements OnInit {
                 status: this.paramsTicket.status,
                 descriptionContent:this.paramsTicket.description
             };
-            this.ticketService.newTicket(this.currentSection.sectionId, newTicket).subscribe(
+            this.ticketService.newTicket(this.currentSection.sectionId , this.selectedSprint.sprintId , newTicket).subscribe(
                 (response) => {
                     console.log('Ticket added successfully:', response);
                     this.sectionList.find((section: any) => section.sectionId === this.currentSection.sectionId)?.tickets.push(response);
