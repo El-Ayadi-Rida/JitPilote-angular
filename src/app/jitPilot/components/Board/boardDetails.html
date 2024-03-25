@@ -271,7 +271,10 @@
                     </div>
                     <div>
                         <label for="taskTitle">Sprint</label>
-                        <ng-select [items]="sprintsList" [(ngModel)]="sprint" [searchable]="false" [clearable]="false" class="custom-multiselect"> </ng-select>
+                        <select name="sprint" id="sprintId" class="form-select" [(ngModel)]="selectedSprint">
+                            <option *ngFor="let sprint of sprintsList" [value]="sprint">sprint {{ sprint.sprintNumber?.toString() }}</option>
+                        </select>
+                        <!-- <ng-select [items]="sprintsList" [(ngModel)]="paramsTicket.sprint" [searchable]="false" [clearable]="false" class="custom-multiselect"> </ng-select> -->
                         <!-- <input id="taskTitle" [(ngModel)]="paramsTicket.title" name="title" type="text" class="form-input" placeholder="Enter Name" /> -->
                     </div>
 
