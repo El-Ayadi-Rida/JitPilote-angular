@@ -99,7 +99,7 @@ export class BoardDetailsComponent implements OnInit {
         priority: TicketPriority.HIGH,
         status: TicketStatus.IN_PROGRESS,
         tasks:[],
-        complexityPoints:0,
+        complexityPoints:null,
         users:[],
         endDate: ''
 
@@ -342,7 +342,7 @@ export class BoardDetailsComponent implements OnInit {
             tasks:[],
             users:[],
             endDate:'',
-            complexityPoints:0
+            complexityPoints:null
         };
         if (ticket) {
             this.paramsTicket = JSON.parse(JSON.stringify(ticket));
