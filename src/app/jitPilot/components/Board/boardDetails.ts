@@ -19,6 +19,8 @@ import { TaskService } from '../../services/task.service';
 import { Sprint } from '../../models/sprint';
 import { SprintService } from '../../services/sprint.service';
 import { log } from 'console';
+import { UserService } from '../../services/user.service';
+import { UserResponse } from '../../models/user-response';
 
 @Component({
     moduleId: module.id,
@@ -38,7 +40,9 @@ export class BoardDetailsComponent implements OnInit {
         private sectionService: SectionService,
         private ticketService: TicketService,
         private taskService:TaskService,
-        private sprintService:SprintService
+        private sprintService:SprintService,
+        private userService: UserService
+
     ) {}
     ngOnInit(): void {
         this.route.params.subscribe((params) => {
@@ -48,6 +52,8 @@ export class BoardDetailsComponent implements OnInit {
         this.getSprints();
         this.workspaceId = JSON.parse(sessionStorage.getItem('workspaceItem')!).workspaceId;
         console.log(this.workspaceId);
+        this.getUsers();
+
     }    
     boardId: number = 0;
     currentBoard!: Board;
@@ -93,7 +99,10 @@ export class BoardDetailsComponent implements OnInit {
         priority: TicketPriority.HIGH,
         status: TicketStatus.IN_PROGRESS,
         tasks:[],
-        complexityPoints:0
+        complexityPoints:0,
+        users:[],
+        endDate: ''
+
     };
     paramsTask = {
         taskId: null,
@@ -104,7 +113,7 @@ export class BoardDetailsComponent implements OnInit {
     editorOptions = {
         toolbar: [[{ header: [1, 2, false] }], ['bold', 'italic', 'underline', 'link'], [{ list: 'ordered' }, { list: 'bullet' }], ['clean']],
     };
-    sprintsList: Sprint[] = [    ]
+    sprintsList: Sprint[] = [  ]
     selectedSprint!: any;
 
 
@@ -278,6 +287,9 @@ export class BoardDetailsComponent implements OnInit {
         setTimeout(() => {
             this.currentSection = section;
             this.paramsTicket = JSON.parse(JSON.stringify(ticket));
+            this.users= this.paramsTicket.users;
+            this.filtredUsers=this.users;
+
             this.taskService.getTasksByTicket(ticket.ticketId).subscribe(
                 (response) => {
                     console.log('tasks fetched successfully:', response);
@@ -328,6 +340,8 @@ export class BoardDetailsComponent implements OnInit {
             priority: TicketPriority.HIGH,
             status: TicketStatus.IN_PROGRESS,
             tasks:[],
+            users:[],
+            endDate:'',
             complexityPoints:0
         };
         if (ticket) {
@@ -353,6 +367,8 @@ export class BoardDetailsComponent implements OnInit {
                 priority: this.paramsTicket.priority,
                 status: this.paramsTicket.status,
                 descriptionContent:this.paramsTicket.descriptionContent,
+                endDate:this.paramsTicket.endDate
+
             };
             console.log(ticketToUpdate);
             
@@ -366,6 +382,7 @@ export class BoardDetailsComponent implements OnInit {
                     ticket.descriptionContent = ticketToUpdate.descriptionContent;
                     ticket.priority = ticketToUpdate.priority;
                     ticket.status = ticketToUpdate.status;
+                    
 
                 },
                 (error) => {
@@ -380,7 +397,10 @@ export class BoardDetailsComponent implements OnInit {
                 description: this.paramsTicket.description,
                 priority: this.paramsTicket.priority,
                 status: this.paramsTicket.status,
-                descriptionContent:this.paramsTicket.description
+                descriptionContent:this.paramsTicket.description,
+                endDate:this.paramsTicket.endDate,
+                complexityPoints:this.paramsTicket.complexityPoints
+
             };
             this.ticketService.newTicket(this.currentSection.sectionId , this.selectedSprint.sprintId , newTicket).subscribe(
                 (response) => {
@@ -585,6 +605,76 @@ export class BoardDetailsComponent implements OnInit {
     changeSelectedSprint(sprint: any){
         this.selectedSprint = sprint
     }
+
+    usersList!:UserResponse[];
+
+    getUsers(): void {
+        this.userService.getUsers().subscribe((data: UserResponse[]) => {
+            this.usersList = data;
+            console.log(data);
+        });
+    }
+
+    isDropdownOpen: boolean = false;
+
+    closeDropdown() {
+        this.isDropdownOpen = false;
+    }
+
+
+
+    users!:UserResponse[];
+    filtredUsers: any = [];
+    ticketPriorities = TicketPriority;
+
+
+    selectUser(ticketId: any, userId: number,user:any){
+        this.ticketService.addUserInTicket(ticketId, userId).subscribe(
+            (response) => {
+               this.filtredUsers.push(user);
+               this.sectionList.find(s => s.sectionId === this.params.sectionId)?.tickets.find(t => t.ticketId === this.paramsTicket.ticketId)?.users.push(user);                
+            },
+            (error) => {
+                console.error('Error selecting user:', error);
+            }
+        );
+        this.closeDropdown();
+
+       
+    }
+
+    userExistsInMembers(userId: any): boolean {
+        return this.users.some(member => member.userId.toString() === userId.toString());
+
+    }
+    
+
+
+   
+    removeUserInTicket(ticketId: any, userId: any, user: any) {
+        console.log(userId);
+        this.ticketService.removeUserFromTicket(ticketId, userId).subscribe(
+            (next) => {
+
+                this.filtredUsers = this.filtredUsers.filter((filteredUser: UserResponse) => filteredUser.userId !== userId);
+                console.log(this.filtredUsers);
+                const ticket = this.sectionList.find(s => s.sectionId === this.params.sectionId)?.tickets.find(t => t.ticketId === this.paramsTicket.ticketId);
+            if (ticket) {
+                ticket.users = ticket.users.filter((u: any) => u.userId !== userId);
+            }
+
+            },
+            (error) => {
+                console.error('Error removing user from ticket:', error);
+            }
+        );
+    }
+
+    getEnumValues(enumObj: any): string[] {
+        return Object.values(enumObj).filter(value => typeof value === 'string') as string[];
+    }
+
+
 
 
 }
